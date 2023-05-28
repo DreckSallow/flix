@@ -1,7 +1,30 @@
 import { createApp } from "vue";
+import { RouteRecordRaw, createRouter, createWebHistory } from "vue-router";
 import "./reset.css";
 import "./styles.css";
 import "uno.css";
-import App from "./App.vue";
+import { HomePage, StudyAreaPage } from "./pages";
+import AppVue from "./App.vue";
 
-createApp(App).mount("#app");
+const routes: RouteRecordRaw[] = [
+  {
+    path: "/",
+    name: "Home",
+    component: HomePage,
+  },
+  {
+    path: "/:area",
+    name: "StudyArea",
+    component: StudyAreaPage,
+  },
+];
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+});
+
+const app = createApp(AppVue);
+app.use(router);
+
+app.mount("#app");

@@ -1,0 +1,41 @@
+#app {
+  width: 100vw;
+  min-height: 100vh;
+  height: 100vh;
+  display: grid;
+  place-content: center;
+}
+
+.light-theme {
+  --alpha: 1;
+  --bg-strong: 202, 40%, 96%;
+  --bg-soft: 227, 13%, 86%;
+
+  --text-strong: red;
+  --text-soft: green;
+}
+
+.dark-theme {
+  --alpha: 1;
+  --bg-strong: red;
+  --bg-soft: white;
+
+  --text-strong: red;
+  --text-soft: green;
+}
+
+.bg-strong {
+  background-color: hsla(var(--bg-strong), var(--alpha));
+}
+
+.bg-soft {
+  background-color: hsla(var(--bg-soft), var(--alpha));
+}
+
+.text-strong {
+  background-color: hsla(var(--text-strong), var(--alpha));
+}
+
+.text-soft {
+  background-color: hsla(var(--text-soft), var(--alpha));
+}
