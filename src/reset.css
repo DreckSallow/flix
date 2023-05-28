@@ -81,14 +81,14 @@ q:after {
   content: none;
 }
 
-::-moz-selection {
+/* ::-moz-selection {
   background-color: var(--negro);
   color: var(--blanco);
 }
 ::selection {
   background-color: var(--negro);
   color: var(--blanco);
-}
+} */
 
 form,
 input,
