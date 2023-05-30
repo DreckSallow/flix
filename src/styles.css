@@ -1,15 +1,39 @@
+html{
+  font-family: 'Roboto', sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 0.2em;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #cfcaca00;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(112, 111, 111);
+}
+
 #app {
   width: 100vw;
   min-height: 100vh;
   height: 100vh;
-  display: grid;
-  place-content: center;
 }
+
 
 .light-theme {
   --alpha: 1;
   --bg-strong: 202, 40%, 96%;
-  --bg-soft: 227, 13%, 86%;
+  /* --bg-soft: 227, 13%, 86%; */
+  --bg-soft: 201, 30%, 61%,
 
   --text-strong: red;
   --text-soft: green;
