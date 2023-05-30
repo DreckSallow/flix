@@ -1,43 +1,100 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
+import { onBeforeUnmount, onMounted } from "vue";
 
-let cards = [
+onMounted(() => {
+  document.querySelector("#app")?.classList.add("flex", "flex-row");
+});
+
+onBeforeUnmount(() => {
+  document.querySelector("#app")?.classList.remove("flex", "flex-row");
+});
+
+let spaces = [
   {
     title: "Ingles",
-    description: "Learn Ingles today",
   },
   {
     title: "Aleman",
-    description: "Learn aleman today using FLIX!",
   },
   {
     title: "Sueco",
-    description: "Learning Sueco",
+  },
+  {
+    title: "Zig",
+  },
+  {
+    title: "Rust",
+  },
+  {
+    title: "Español",
+  },
+  {
+    title: "Quechua",
+  },
+  {
+    title: "Quechua-1",
+  },
+  {
+    title: "Quechua-2",
+  },
+  {
+    title: "Quechua-3",
+  },
+  {
+    title: "Quechua-4",
+  },
+  {
+    title: "Quechua-5",
   },
 ];
-const router = useRouter();
 </script>
 
 <template>
-  <main class="flex flex-col gap-4">
-    <header class="text-center">OPTIONS</header>
-    <ul
-      class="max-w-300 max-h-100 max-h-100 border border-orange-400 flex flex-row gap-4 flex-wrap"
-    >
+  <aside
+    class="sidebar-main flex flex-col items-center justify-start py-6 gap-4 h-full bg-gray-100"
+  >
+    <ul class="flex flex-col gap-4 overflow-auto items-center w-full">
       <li
-        v-for="card in cards"
-        class="p-4 bg-soft rounded-lg w-40 h-40 flex-center flex-col gap-4 cursor-pointer"
-        :redirect="card.title"
+        v-for="space in spaces"
+        class="rounded-lg w-10 h-10 bg-white grid place-content-center cursor-pointer"
+        :class="{
+          selected: $route.params.area === space.title,
+        }"
       >
-        <h4 class="text-lg font-semibold">
-          <router-link :to="card.title">
-            {{ card.title }}
-          </router-link>
-        </h4>
-        <p>{{ card.description }}</p>
+        <router-link :to="space.title" class="h-full w-full p-4">
+          {{ space.title.slice(0, 2).toUpperCase() }}
+        </router-link>
       </li>
     </ul>
-  </main>
+    <router-link
+      class="rounded-lg w-10 h-10 bg-white grid place-content-center cursor-pointer"
+      to="new-space"
+    >
+      +
+    </router-link>
+  </aside>
+  <section class="section-content h-full">
+    <router-view></router-view>
+  </section>
 </template>
 
-<style scoped></style>
+<style scoped>
+aside.sidebar-main {
+  /* border-right: 1px solid #90969ea1; */
+  /* --bg-sidebar: 200, 13%, 95%; */
+  width: 80px;
+  /* background-color: hsl(var(--bg-sidebar), var(--alpha)); */
+}
+
+aside.sidebar-main > ul {
+  max-height: 80%;
+}
+
+section.section-content {
+  width: calc(100% - 74px);
+}
+
+li.selected {
+  /* border: 2px solid red; */
+}
+</style>
