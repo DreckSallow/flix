@@ -1,0 +1,14 @@
+[package]
+name = "flix_utils"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+zip = "0.6"
+rusqlite = { version = "0.29.0", features = ["bundled"] }
+thiserror = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+flix_data = { path = "../flix_data" }

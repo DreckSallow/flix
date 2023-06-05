@@ -53,6 +53,7 @@ let spaces = [
   <aside
     class="sidebar-main flex flex-col items-center justify-start py-6 gap-4 h-full bg-gray-100"
   >
+    <h3 class="text-blue-400 font-bold text-lg">FLIX</h3>
     <ul class="flex flex-col gap-4 overflow-auto items-center w-full">
       <li
         v-for="space in spaces"
