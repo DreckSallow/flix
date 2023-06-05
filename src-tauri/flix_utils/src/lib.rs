@@ -1,1 +1,1 @@
-pub mod flix_adapters;
+mod flix_adapters;
