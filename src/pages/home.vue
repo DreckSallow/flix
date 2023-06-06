@@ -1,52 +1,23 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted } from "vue";
+import { invoke } from "@tauri-apps/api";
+import { onBeforeUnmount, onMounted, ref } from "vue";
+
+let spaces = ref<{ title: string }[]>([]);
 
 onMounted(() => {
   document.querySelector("#app")?.classList.add("flex", "flex-row");
+  invoke("workspaces_handler")
+    .then((w) => {
+      spaces.value = (w as string[]).map((s) => ({ title: s }));
+    })
+    .catch((e) => {
+      console.log("Error: ", e);
+    });
 });
 
 onBeforeUnmount(() => {
   document.querySelector("#app")?.classList.remove("flex", "flex-row");
 });
-
-let spaces = [
-  {
-    title: "Ingles",
-  },
-  {
-    title: "Aleman",
-  },
-  {
-    title: "Sueco",
-  },
-  {
-    title: "Zig",
-  },
-  {
-    title: "Rust",
-  },
-  {
-    title: "Español",
-  },
-  {
-    title: "Quechua",
-  },
-  {
-    title: "Quechua-1",
-  },
-  {
-    title: "Quechua-2",
-  },
-  {
-    title: "Quechua-3",
-  },
-  {
-    title: "Quechua-4",
-  },
-  {
-    title: "Quechua-5",
-  },
-];
 </script>
 
 <template>
@@ -81,10 +52,7 @@ let spaces = [
 
 <style scoped>
 aside.sidebar-main {
-  /* border-right: 1px solid #90969ea1; */
-  /* --bg-sidebar: 200, 13%, 95%; */
   width: 80px;
-  /* background-color: hsl(var(--bg-sidebar), var(--alpha)); */
 }
 
 aside.sidebar-main > ul {
