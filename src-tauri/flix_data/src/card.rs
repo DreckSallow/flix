@@ -1,23 +1,28 @@
 use std::path::PathBuf;
 
-#[derive(Clone, Debug)]
-pub struct Card<'a> {
-    front: &'a str,
-    back: &'a str,
+use serde::Serialize;
+
+#[derive(Clone, Debug, Serialize)]
+pub struct Card {
+    id: u32,
+    front: String,
+    back: String,
     audio: Option<PathBuf>,
     image: Option<PathBuf>,
 }
 
-impl<'a> Card<'a> {
+impl Card {
     pub fn new(
-        front: &'a str,
-        back: &'a str,
+        id: u32,
+        front: &str,
+        back: &str,
         audio: Option<PathBuf>,
         image: Option<PathBuf>,
     ) -> Self {
         Self {
-            front,
-            back,
+            id,
+            front: front.into(),
+            back: back.into(),
             audio,
             image,
         }

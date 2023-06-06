@@ -782,6 +782,8 @@ version = "0.1.0"
 dependencies = [
  "directories",
  "rusqlite",
+ "serde",
+ "serde_json",
  "thiserror",
 ]
 
@@ -789,6 +791,7 @@ dependencies = [
 name = "flix_utils"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "flix_data",
  "rusqlite",
  "serde",

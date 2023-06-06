@@ -1,23 +1,21 @@
-use std::path::PathBuf;
+use serde::Serialize;
 
 use crate::card::Card;
 
-#[derive(Clone, Debug)]
-pub struct Deck<'a> {
-    name: &'a str,
-    cards: Vec<Card<'a>>,
-    image: Option<PathBuf>,
+#[derive(Clone, Debug, Serialize)]
+pub struct Deck {
+    name: String,
+    cards: Vec<Card>,
 }
 
-impl<'a> Deck<'a> {
-    pub fn new(name: &'a str, image: Option<PathBuf>) -> Self {
+impl Deck {
+    pub fn new(name: &str) -> Self {
         Self {
-            name,
+            name: name.into(),
             cards: vec![],
-            image,
         }
     }
-    pub fn with_cards(self, cards: Vec<Card<'a>>) -> Self {
+    pub fn with_cards(self, cards: Vec<Card>) -> Self {
         Self { cards, ..self }
     }
 }

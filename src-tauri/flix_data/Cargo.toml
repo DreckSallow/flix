@@ -9,3 +9,6 @@ edition = "2021"
 rusqlite = { version = "0.29.0", features = ["bundled"] }
 thiserror = { workspace = true }
 directories = "5.0"
+
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
