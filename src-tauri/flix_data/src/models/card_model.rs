@@ -2,6 +2,8 @@ use std::{path::Path, rc::Rc};
 
 use rusqlite::{params, Connection, Result};
 
+use crate::card::Card;
+
 pub struct CardModel {
     conn: Rc<Connection>,
 }
@@ -29,5 +31,28 @@ impl CardModel {
                 image.map(|p| p.as_ref().to_string_lossy().to_string()),
             ],
         )
+    }
+    pub fn find_all(&self) -> Result<Vec<Card>> {
+        let mut smt = self.conn.prepare("SELECT * from cards")?;
+
+        let cards: Vec<Card> = smt
+            .query_map((), |r| {
+                let id: u32 = r.get(0)?;
+                let (front, back): (String, String) = (r.get(1)?, r.get(2)?);
+                let (audio, image): (Option<String>, Option<String>) = (r.get(3)?, r.get(4)?);
+
+                Ok(Card::new(
+                    id,
+                    &front,
+                    &back,
+                    audio.map(|p| p.into()),
+                    image.map(|p| p.into()),
+                ))
+            })?
+            .filter(|r| r.is_ok())
+            .map(|r| r.unwrap())
+            .collect();
+
+        Ok(cards)
     }
 }
