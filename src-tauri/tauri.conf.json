@@ -16,6 +16,10 @@
       "shell": {
         "all": false,
         "open": true
+      },
+      "protocol": {
+        "asset": true,
+        "assetScope": ["$LOCALDATA/**"]
       }
     },
     "bundle": {
@@ -30,9 +34,7 @@
         "icons/icon.ico"
       ]
     },
-    "security": {
-      "csp": null
-    },
+
     "windows": [
       {
         "fullscreen": false,
