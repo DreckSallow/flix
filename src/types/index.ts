@@ -1,16 +1,30 @@
-export interface Workspace {
+export interface IWorkspace {
   name: string;
   image?: string;
 }
 
-export interface Card {
+export interface ICard {
+  id: number;
   front: string;
   back: string;
-  audio_path?: string;
-  image_path?: string;
 }
 
-export interface Deck {
+export interface IDeck {
   name: string;
-  cards: Card[];
+  cards: ICard[];
+}
+
+export interface ICardResponse {
+  front: string;
+  back: string;
+  id: number;
+  items: {
+    [k: string]: string;
+  };
+}
+
+export interface IDeckResponse {
+  path: string;
+  name: string;
+  cards: ICardResponse[];
 }

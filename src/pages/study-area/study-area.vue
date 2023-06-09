@@ -1,16 +1,9 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import StudyCards from "./study-cards.vue";
-import { CardsIcon, BookIcon } from "../../components/icons";
-import { invoke } from "@tauri-apps/api";
-import { useRoute } from "vue-router";
-import { Deck } from "../../types";
+import { CardsIcon, BookIcon } from "@components/icons";
 
 const showModal = ref(true);
-
-const decks = ref<Deck[]>([]);
-
-const route = useRoute();
 
 function listenKey(e: KeyboardEvent) {
   if (e.code === "KeyB" && e.ctrlKey) {
@@ -20,16 +13,6 @@ function listenKey(e: KeyboardEvent) {
 
 onMounted(() => {
   window.addEventListener("keydown", listenKey);
-  invoke("get_decks_handler", {
-    workspaceName: route.params.area,
-  })
-    .then((data) => {
-      decks.value = data as Deck[];
-      console.log("decks: ", decks);
-    })
-    .catch((e) => {
-      console.error("study-area: ", e);
-    });
 });
 
 onBeforeUnmount(() => {
@@ -77,7 +60,7 @@ function changeRenderPage(page: TRendePage) {
       class="section-content h-full bg-white"
       :class="{ expanded: !showModal }"
     >
-      <StudyCards v-if="renderPage === 'cards'" :decks="decks" />
+      <StudyCards v-if="renderPage === 'cards'" />
       <div class="bg-orange-400" v-if="renderPage === 'documents'">NOTES</div>
     </section>
   </div>
