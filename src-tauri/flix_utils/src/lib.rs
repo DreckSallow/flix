@@ -49,13 +49,7 @@ pub fn get_workspace_data(workspace_name: &str) -> Result<Vec<Deck>> {
         let model = CardModel::new(Rc::clone(&conn));
 
         if let Ok(cards) = model.find_all() {
-            let deck = Deck::new(
-                deck_path
-                    .file_name()
-                    .map(|t| t.to_str().or(Some("")).unwrap())
-                    .unwrap(),
-            )
-            .with_cards(cards);
+            let deck = Deck::new(deck_path).with_cards(cards);
             decks.push(deck)
         }
     }
@@ -77,6 +71,7 @@ mod test_flix_utils {
     #[test]
     fn test_workspace_data() {
         let res = get_workspace_data("japanese");
+        assert!(false);
         assert!(res.is_ok());
     }
 }
