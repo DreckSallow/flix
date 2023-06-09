@@ -1,11 +1,9 @@
-use std::{path::Path, rc::Rc};
+use std::path::Path;
 
-use flix_data::{
-    local_data,
-    models::{card_model, open_db},
-};
+use flix_data::{local_data, models::card_model};
 
 mod anki;
+mod card_format;
 
 #[derive(Debug)]
 pub enum ImportType {
@@ -28,13 +26,16 @@ pub fn use_import_decks<P: AsRef<Path>>(import_type: ImportType, path: P, worksp
         }
         Ok((path, cards)) => {
             directory.push(path);
-            let conn = open_db(directory.join("cards.db")).unwrap();
-
-            let model = card_model::CardModel::new(Rc::new(conn));
+            let model = card_model::CardModel::open_connection(directory.join("cards.db")).unwrap();
 
             for card in cards {
                 model
-                    .create(&card.text, "", card.audio_path, card.image_path)
+                    .create(
+                        &card.front_format,
+                        &card.back_format,
+                        &card.text_items,
+                        &card.items_format,
+                    )
                     .unwrap();
             }
         }
@@ -47,9 +48,10 @@ mod import_test {
     use super::{use_import_decks, ImportType};
 
     #[test]
-    fn print_files() {
+    fn read_anki_files() {
         let path = "../.hidden/japanese.apkg";
-        let _res = use_import_decks(ImportType::Anki, path, "japanese");
-        assert!(true); //FIXME: change this;
+        use_import_decks(ImportType::Anki, path, "japanese");
+        assert!(false); //FIXME: change this;
+                        // assert!(true);
     }
 }
