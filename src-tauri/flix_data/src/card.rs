@@ -1,30 +1,22 @@
-use std::path::PathBuf;
+use std::collections::HashMap;
 
 use serde::Serialize;
 
 #[derive(Clone, Debug, Serialize)]
 pub struct Card {
     id: u32,
+    items: HashMap<String, String>,
     front: String,
     back: String,
-    audio: Option<PathBuf>,
-    image: Option<PathBuf>,
 }
 
 impl Card {
-    pub fn new(
-        id: u32,
-        front: &str,
-        back: &str,
-        audio: Option<PathBuf>,
-        image: Option<PathBuf>,
-    ) -> Self {
+    pub fn new(id: u32, items: HashMap<String, String>, front: String, back: String) -> Self {
         Self {
             id,
-            front: front.into(),
-            back: back.into(),
-            audio,
-            image,
+            items,
+            front,
+            back,
         }
     }
 }
