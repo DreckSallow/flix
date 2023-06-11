@@ -13,7 +13,7 @@ const modalContent = ref<HTMLElement | null>(null);
 
 function onOutClick(ev: MouseEvent) {
   if (!modalContent.value) {
-    throw new Error("Content modal should exist!");
+    return;
   }
   const target = ev.target as HTMLElement;
 
@@ -39,12 +39,15 @@ onBeforeUnmount(() => {
   >
     <Transition name="mdl">
       <div
+        tabindex="0"
+        @keyup.esc="$emit('close')"
         v-if="show"
         ref="modalContent"
         class="modal-content bg-gray-200 relative p-4 pt-8 rounded-lg"
       >
         <button
           @click="$emit('close')"
+          tabindex="0"
           class="bg-gray-300 absolute top-1 right-1 cursor-pointer rounded-0.5"
         >
           <CloseIcon class="h-5 w-5 fill-gray-700" />
@@ -73,11 +76,5 @@ div.modal-show {
 .mdl-leave-to {
   transform: translateY(-30px);
   opacity: 0;
-}
-
-div.modal-content {
-  display: grid;
-  overflow: hidden;
-  grid-template-rows: 26px 1fr;
 }
 </style>
