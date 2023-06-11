@@ -1,14 +1,21 @@
 <script setup lang="ts">
+import { Modal } from "@components/modals";
 import { invoke } from "@tauri-apps/api";
 import { onBeforeUnmount, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 let spaces = ref<{ title: string }[]>([]);
+
+const router = useRouter();
 
 onMounted(() => {
   document.querySelector("#app")?.classList.add("flex", "flex-row");
   invoke("workspaces_handler")
     .then((w) => {
       spaces.value = (w as string[]).map((s) => ({ title: s }));
+      if ((w as string[]).length > 0) {
+        router.push((w as string[])[0]);
+      }
     })
     .catch((e) => {
       console.log("Error: ", e);
@@ -18,6 +25,30 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.querySelector("#app")?.classList.remove("flex", "flex-row");
 });
+
+const showModal = ref(false);
+
+const createWorkspaceValue = ref("");
+
+function create_workspace() {
+  invoke("create_workspace_handler", {
+    workspaceName: createWorkspaceValue.value,
+  })
+    .then(() => {
+      spaces.value.push({
+        title: createWorkspaceValue.value,
+      });
+      createWorkspaceValue.value = "";
+      router.push(createWorkspaceValue.value);
+    })
+    .catch((e) => {
+      console.log("ERROR CREATING WORKSPACE: ", e);
+    })
+    .finally(() => {
+      showModal.value = false;
+      console.log("ERROR");
+    });
+}
 </script>
 
 <template>
@@ -38,13 +69,42 @@ onBeforeUnmount(() => {
         </router-link>
       </li>
     </ul>
-    <router-link
+    <button
+      tabindex="0"
       class="rounded-lg w-10 h-10 bg-white grid place-content-center cursor-pointer"
-      to="new-space"
+      @click.stop="showModal = true"
+      @keyup.enter="showModal = true"
     >
       +
-    </router-link>
+    </button>
   </aside>
+  <Modal @close="showModal = false" :show="showModal">
+    <div class="content-modal flex flex-col gap-2">
+      <input
+        type="text"
+        class="border-b border-gray-600/80 border-solid p-1"
+        tabindex="1"
+        v-model="createWorkspaceValue"
+        @keyup.enter="create_workspace"
+      />
+      <div class="flex flex-row gap-4 justify-end">
+        <button
+          class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
+          tabindex="2"
+          @click="create_workspace"
+        >
+          Ok
+        </button>
+        <button
+          tabindex="3"
+          class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
+          @click="showModal = false"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </Modal>
   <section class="section-content h-full">
     <router-view></router-view>
   </section>

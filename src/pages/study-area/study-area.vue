@@ -41,6 +41,7 @@ function changeRenderPage(page: TRendePage) {
         <li
           page="cards"
           class="cursor-pointer flex flex-row gap-2"
+          tabindex="0"
           @click="changeRenderPage('cards')"
         >
           <CardsIcon class="h-5 w-5 fill-gray-600" />
@@ -49,6 +50,7 @@ function changeRenderPage(page: TRendePage) {
         <li
           page="notes"
           class="cursor-pointer flex flex-row gap-2"
+          tabindex="0"
           @click="changeRenderPage('documents')"
         >
           <BookIcon class="h-5 w-5 fill-gray-600" />
@@ -60,7 +62,10 @@ function changeRenderPage(page: TRendePage) {
       class="section-content h-full bg-white"
       :class="{ expanded: !showModal }"
     >
-      <StudyCards v-if="renderPage === 'cards'" />
+      <StudyCards
+        v-if="renderPage === 'cards'"
+        :workspace-name="$route.params.area"
+      />
       <div class="bg-orange-400" v-if="renderPage === 'documents'">NOTES</div>
     </section>
   </div>

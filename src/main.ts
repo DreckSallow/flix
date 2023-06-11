@@ -13,13 +13,6 @@ const routes: RouteRecordRaw[] = [
     component: HomePage,
     children: [
       {
-        path: "new-space",
-        name: "NewSpace",
-        component: {
-          template: "<div>CREATE NEW SPACE</div>",
-        },
-      },
-      {
         path: ":area",
         name: "StudyArea",
         component: StudyAreaPage,
