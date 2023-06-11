@@ -57,6 +57,45 @@ pub fn get_workspace_data(workspace_name: &str) -> Result<Vec<Deck>> {
     Ok(decks)
 }
 
+pub fn create_deck(workspace_name: &str, deck_name: &str) -> Result<Deck> {
+    let mut workspaces_path =
+        get_folder_path("workspaces").ok_or_else(|| anyhow!("Folder workspace not found"))?;
+
+    workspaces_path.push(workspace_name);
+
+    if !workspaces_path.exists() {
+        return Err(anyhow!("Workspace not exist"));
+    }
+    let deck_path = workspaces_path.join(deck_name);
+    fs::create_dir(&deck_path)?;
+
+    Ok(Deck::new(deck_path))
+}
+
+// pub fn create_card(deck_path: &str, front: &str, back: &str, text_items: &str) -> Result<Card> {
+//     let card_model = CardModel::open_connection(PathBuf::from(deck_path).join("cards.db"))?;
+//     // texto
+//     // audio
+//     // imagen
+//     //texto
+//     // audio
+//     // imagen
+
+//     card_model.create(front, back, text_items, "")?;
+//     //FIXME: the card id
+//     // Ok(Card::new(0, , front.to_string(), back.to_string()))
+// }
+
+pub fn create_workspace(workspace_name: &str) -> Result<()> {
+    let mut workspaces_path =
+        get_folder_path("workspaces").ok_or_else(|| anyhow!("Folder workspace not found"))?;
+
+    workspaces_path.push(workspace_name);
+    fs::create_dir(workspaces_path)?;
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod test_flix_utils {
     use crate::{get_workspace_data, get_workspaces};

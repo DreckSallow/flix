@@ -3,13 +3,17 @@
 
 mod handlers;
 
-use handlers::{get_decks_handler, workspaces_handler};
+use handlers::{
+    create_deck_handler, create_workspace_handler, get_decks_handler, workspaces_handler,
+};
 
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             workspaces_handler,
-            get_decks_handler
+            get_decks_handler,
+            create_deck_handler,
+            create_workspace_handler
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
