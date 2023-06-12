@@ -19,13 +19,7 @@ onBeforeUnmount(() => {
   window.removeEventListener("keydown", listenKey);
 });
 
-type TRendePage = "documents" | "cards";
-
-const renderPage = ref<TRendePage>("cards");
-
-function changeRenderPage(page: TRendePage) {
-  renderPage.value = page;
-}
+const renderPage = ref<"documents" | "cards">("cards");
 </script>
 
 <template>
@@ -39,19 +33,17 @@ function changeRenderPage(page: TRendePage) {
       </header>
       <ul class="flex flex-col gap-4 pl-4">
         <li
-          page="cards"
           class="cursor-pointer flex flex-row gap-2"
           tabindex="0"
-          @click="changeRenderPage('cards')"
+          @click="renderPage = 'cards'"
         >
           <CardsIcon class="h-5 w-5 fill-gray-600" />
           <span>Cards</span>
         </li>
         <li
-          page="notes"
           class="cursor-pointer flex flex-row gap-2"
           tabindex="0"
-          @click="changeRenderPage('documents')"
+          @click="renderPage = 'documents'"
         >
           <BookIcon class="h-5 w-5 fill-gray-600" />
           <span>Docs</span>

@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
+import { invoke } from "@tauri-apps/api";
+import { sep } from "@tauri-apps/api/path";
 import { IDeckResponse } from "../../types";
 import { ArrowIcon } from "@components/icons";
-import DeckSection from "./deck-section.vue";
-import { invoke } from "@tauri-apps/api";
-
 import { Modal } from "@components/modals";
+import DeckSection from "./deck-section.vue";
+import CreateDeckForm from "../components/create-deck-form.vue";
 
 interface Props {
   workspaceName: string;
@@ -37,30 +38,47 @@ const current_deck = ref<IDeckResponse | null>(null);
 
 const showModal = ref(false);
 
-const createDeckValue = ref("");
+function createDeck(info: { pathFile?: string; name?: string }) {
+  const newDeckName = info.pathFile?.split(sep).pop() ?? info.name;
 
-function createDeck() {
-  if (createDeckValue.value.length == 0) {
+  if (!newDeckName) {
     return;
   }
 
-  if (decks.value.some(({ name }) => name === createDeckValue.value)) {
+  if (decks.value.some(({ name }) => name === newDeckName)) {
+    //TODO: Warn to the user about this mistake
     return;
   }
 
-  invoke("create_deck_handler", {
-    workspaceName: props.workspaceName,
-    deckName: createDeckValue.value,
-  })
-    .then((deck) => {
-      decks.value.push(deck as IDeckResponse);
+  if (info.pathFile) {
+    invoke("import_deck_handler", {
+      workspaceName: props.workspaceName,
+      deckPath: info.pathFile,
     })
-    .catch((e) => {
-      console.log("CREATE DECK ERROR: ", e);
+      .then((deck) => {
+        decks.value.push(deck as IDeckResponse);
+      })
+      .catch((e) => {
+        console.log("CREATE DECK ERROR: ", e);
+      })
+      .finally(() => {
+        showModal.value = false;
+      });
+  } else if (info.name) {
+    invoke("create_deck_handler", {
+      workspaceName: props.workspaceName,
+      deckName: newDeckName,
     })
-    .finally(() => {
-      showModal.value = false;
-    });
+      .then((deck) => {
+        decks.value.push(deck as IDeckResponse);
+      })
+      .catch((e) => {
+        console.log("CREATE DECK ERROR: ", e);
+      })
+      .finally(() => {
+        showModal.value = false;
+      });
+  }
 }
 </script>
 
@@ -104,31 +122,7 @@ function createDeck() {
     className="modal-container"
     :show="showModal"
   >
-    <div class="flex flex-col gap-2">
-      <input
-        type="text"
-        class="border-b border-gray-600/80 border-solid p-1"
-        tabindex="1"
-        v-model="createDeckValue"
-        @keypress.enter="createDeck"
-      />
-      <div class="flex flex-row gap-4 justify-end">
-        <button
-          class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
-          tabindex="2"
-          @click="createDeck"
-        >
-          Ok
-        </button>
-        <button
-          tabindex="3"
-          class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
-          @click="showModal = false"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
+    <CreateDeckForm :workspace-name="workspaceName" @deck-info="createDeck" />
   </Modal>
 </template>
 
@@ -136,16 +130,5 @@ function createDeck() {
 div.deck-card {
   max-width: 150px;
   width: max-content;
-}
-
-:deep(.modal-fuera) {
-  height: 30px;
-  width: 30px;
-  background-color: blueviolet;
-}
-
-:deep(.modal-container) {
-  border: 10px solid red !important;
-  background-color: dodgerblue !important;
 }
 </style>

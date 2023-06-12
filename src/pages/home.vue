@@ -3,8 +3,9 @@ import { Modal } from "@components/modals";
 import { invoke } from "@tauri-apps/api";
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { InputFocused } from "@components/inputs";
 
-let spaces = ref<{ title: string }[]>([]);
+const workspaces = ref<{ title: string }[]>([]);
 
 const router = useRouter();
 
@@ -12,7 +13,7 @@ onMounted(() => {
   document.querySelector("#app")?.classList.add("flex", "flex-row");
   invoke("workspaces_handler")
     .then((w) => {
-      spaces.value = (w as string[]).map((s) => ({ title: s }));
+      workspaces.value = (w as string[]).map((s) => ({ title: s }));
       if ((w as string[]).length > 0) {
         router.push((w as string[])[0]);
       }
@@ -31,15 +32,16 @@ const showModal = ref(false);
 const createWorkspaceValue = ref("");
 
 function create_workspace() {
+  console.log({ value: createWorkspaceValue.value });
   invoke("create_workspace_handler", {
     workspaceName: createWorkspaceValue.value,
   })
     .then(() => {
-      spaces.value.push({
+      workspaces.value.push({
         title: createWorkspaceValue.value,
       });
-      createWorkspaceValue.value = "";
       router.push(createWorkspaceValue.value);
+      createWorkspaceValue.value = "";
     })
     .catch((e) => {
       console.log("ERROR CREATING WORKSPACE: ", e);
@@ -58,7 +60,7 @@ function create_workspace() {
     <h3 class="text-blue-400 font-bold text-lg">FLIX</h3>
     <ul class="flex flex-col gap-4 overflow-auto items-center w-full">
       <li
-        v-for="space in spaces"
+        v-for="space in workspaces"
         class="rounded-lg w-10 h-10 bg-white grid place-content-center cursor-pointer"
         :class="{
           selected: $route.params.area === space.title,
@@ -80,11 +82,10 @@ function create_workspace() {
   </aside>
   <Modal @close="showModal = false" :show="showModal">
     <div class="content-modal flex flex-col gap-2">
-      <input
+      <InputFocused
         type="text"
-        class="border-b border-gray-600/80 border-solid p-1"
         tabindex="1"
-        v-model="createWorkspaceValue"
+        v-model:value="createWorkspaceValue"
         @keyup.enter="create_workspace"
       />
       <div class="flex flex-row gap-4 justify-end">

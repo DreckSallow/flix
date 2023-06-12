@@ -39,7 +39,9 @@ export const replaceTokens = (
 
   tokens.forEach((tk) => {
     let textToInsert = replaces[tk.slice(2, tk.length - 2)];
-
+    if (!textToInsert) {
+      textToInsert = " ";
+    }
     if (textToInsert.startsWith(mediaToken.audio)) {
       let audio = textToInsert.split(":").pop() as string;
       textToInsert = `<audio src="${convertFileSrc(
