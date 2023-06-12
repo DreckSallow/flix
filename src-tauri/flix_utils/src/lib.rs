@@ -1,9 +1,7 @@
-use std::{fs, rc::Rc};
+use std::{fs, path::PathBuf};
 
 use anyhow::{anyhow, Result};
-use flix_data::{
-    db::deck_connect, deck::Deck, local_data::get_folder_path, models::card_model::CardModel,
-};
+use flix_data::{deck::Deck, local_data::get_folder_path, models::card_model::CardModel};
 
 pub mod flix_adapters;
 
@@ -22,6 +20,14 @@ pub fn get_workspaces() -> Result<Vec<String>> {
     });
 
     Ok(workspaces)
+}
+
+pub fn get_deck(deck_path: PathBuf) -> Result<Deck> {
+    let model = CardModel::open_connection(deck_path.join("cards.db"))?;
+
+    let cards = model.find_all()?;
+
+    Ok(Deck::new(deck_path).with_cards(cards))
 }
 
 pub fn get_workspace_data(workspace_name: &str) -> Result<Vec<Deck>> {
@@ -45,12 +51,11 @@ pub fn get_workspace_data(workspace_name: &str) -> Result<Vec<Deck>> {
     let mut decks = vec![];
 
     for deck_path in decks_paths {
-        let conn = Rc::new(deck_connect(deck_path.join("cards.db"))?);
-        let model = CardModel::new(Rc::clone(&conn));
-
-        if let Ok(cards) = model.find_all() {
-            let deck = Deck::new(deck_path).with_cards(cards);
-            decks.push(deck)
+        match get_deck(deck_path.clone()) {
+            Ok(deck) => decks.push(deck),
+            Err(e) => {
+                println!("ERROR {:?}", e);
+            }
         }
     }
 
@@ -68,6 +73,8 @@ pub fn create_deck(workspace_name: &str, deck_name: &str) -> Result<Deck> {
     }
     let deck_path = workspaces_path.join(deck_name);
     fs::create_dir(&deck_path)?;
+    //CREATE THE CARDS TABLE
+    let _ = CardModel::open_connection(&deck_path.join("cards.db"));
 
     Ok(Deck::new(deck_path))
 }

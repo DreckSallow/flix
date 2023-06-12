@@ -1,11 +1,11 @@
-use std::{collections::HashMap, path::Path, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, path::Path, rc::Rc};
 
 use rusqlite::{params, Connection, Result};
 
 use crate::card::Card;
 
 pub struct CardModel {
-    conn: Rc<Connection>,
+    conn: Rc<RefCell<Connection>>,
 }
 
 impl CardModel {
@@ -25,13 +25,14 @@ impl CardModel {
         )?;
 
         Ok(Self {
-            conn: Rc::new(conn),
+            conn: Rc::new(RefCell::new(conn)),
         })
     }
-    pub fn new(conn: Rc<Connection>) -> Self {
-        Self {
-            conn: Rc::clone(&conn),
-        }
+    pub fn new(conn: Rc<RefCell<Connection>>) -> Self {
+        Self { conn }
+    }
+    pub fn get_conn(&self) -> Rc<RefCell<Connection>> {
+        Rc::clone(&self.conn)
     }
 
     pub fn create(
@@ -41,13 +42,16 @@ impl CardModel {
         text_items: &str,
         text_format: &str,
     ) -> Result<usize> {
-        self.conn.execute(
+        self.conn.borrow().execute(
             "INSERT INTO cards (front, back, text_items, text_format) VALUES (?1, ?2, ?3,?4)",
             params![front, back, text_items, text_format],
-        )
+        )?;
+        Ok(self.conn.borrow().last_insert_rowid() as usize)
     }
+
     pub fn find_all(&self) -> Result<Vec<Card>> {
-        let mut smt = self.conn.prepare("SELECT * from cards")?;
+        let conn = self.conn.borrow();
+        let mut smt = conn.prepare("SELECT * from cards")?;
 
         let cards: Vec<Card> = smt
             .query_map((), |r| {

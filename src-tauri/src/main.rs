@@ -4,7 +4,8 @@
 mod handlers;
 
 use handlers::{
-    create_deck_handler, create_workspace_handler, get_decks_handler, workspaces_handler,
+    create_deck_handler, create_workspace_handler, get_decks_handler, import_deck_handler,
+    workspaces_handler,
 };
 
 fn main() {
@@ -13,7 +14,8 @@ fn main() {
             workspaces_handler,
             get_decks_handler,
             create_deck_handler,
-            create_workspace_handler
+            create_workspace_handler,
+            import_deck_handler
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
