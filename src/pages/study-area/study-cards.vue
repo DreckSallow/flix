@@ -9,7 +9,7 @@ import DeckSection from "./deck-section.vue";
 import CreateDeckForm from "../components/create-deck-form.vue";
 
 interface Props {
-  workspaceName: string;
+  workspaceName?: string;
 }
 
 const props = defineProps<Props>();
@@ -19,6 +19,7 @@ const decks = ref<IDeckResponse[]>([]);
 watch(
   () => props.workspaceName,
   () => {
+    if (!props.workspaceName) return;
     invoke("get_decks_handler", {
       workspaceName: props.workspaceName,
     })

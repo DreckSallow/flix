@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { inject, onBeforeUnmount, onMounted, ref } from "vue";
 import StudyCards from "./study-cards.vue";
 import { CardsIcon, BookIcon } from "@components/icons";
+import { workspaceKeyProv, type TWorkspaceProvide } from "../home/provider";
+
+const workspaceData = inject<TWorkspaceProvide>(workspaceKeyProv, null);
 
 const showModal = ref(true);
 
@@ -29,9 +32,9 @@ const renderPage = ref<"documents" | "cards">("cards");
       v-if="showModal"
     >
       <header class="text-lg font-semibold gap-4 text-center p-4">
-        <h4>{{ $route.params.area }}</h4>
+        <h4>{{ workspaceData?.name ?? "No Have workspace" }}</h4>
       </header>
-      <ul class="flex flex-col gap-4 pl-4">
+      <ul class="flex flex-col gap-4 pl-4" v-if="workspaceData">
         <li
           class="cursor-pointer flex flex-row gap-2"
           tabindex="0"
@@ -49,6 +52,9 @@ const renderPage = ref<"documents" | "cards">("cards");
           <span>Docs</span>
         </li>
       </ul>
+      <div class="" v-else>
+        <button>Create a workspace</button>
+      </div>
     </aside>
     <section
       class="section-content h-full bg-white"
@@ -56,7 +62,7 @@ const renderPage = ref<"documents" | "cards">("cards");
     >
       <StudyCards
         v-if="renderPage === 'cards'"
-        :workspace-name="$route.params.area"
+        :workspace-name="workspaceData?.name"
       />
       <div class="bg-orange-400" v-if="renderPage === 'documents'">NOTES</div>
     </section>
