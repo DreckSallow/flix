@@ -13,9 +13,19 @@
   "tauri": {
     "allowlist": {
       "all": false,
+      "dialog": {
+        "open": true
+      },
       "shell": {
         "all": false,
         "open": true
+      },
+      "path": {
+        "all": true
+      },
+      "protocol": {
+        "asset": true,
+        "assetScope": ["$LOCALDATA/**"]
       }
     },
     "bundle": {
@@ -30,9 +40,7 @@
         "icons/icon.ico"
       ]
     },
-    "security": {
-      "csp": null
-    },
+
     "windows": [
       {
         "fullscreen": false,

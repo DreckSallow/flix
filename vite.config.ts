@@ -1,10 +1,28 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import UnoCss from "unocss/vite";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
   plugins: [vue(), UnoCss()],
+  resolve: {
+    alias: [
+      { find: "@", replacement: path.resolve(__dirname, "src") },
+      {
+        find: "@components",
+        replacement: path.resolve(__dirname, "src/components"),
+      },
+      {
+        find: "@utils",
+        replacement: path.resolve(__dirname, "src/utils"),
+      },
+      {
+        find: "@interfaces",
+        replacement: path.resolve(__dirname, "src/interfaces"),
+      },
+    ],
+  },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   // prevent vite from obscuring rust errors

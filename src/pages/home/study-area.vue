@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { inject, onBeforeUnmount, onMounted, ref } from "vue";
+import { CardsIcon, BookIcon } from "@components/icons";
 import StudyCards from "./study-cards.vue";
-import { CardsIcon, BookIcon } from "../../components/icons";
+import { workspaceKeyProv, type TWorkspaceProvide } from "./provider";
+
+const workspaceData = inject<TWorkspaceProvide>(workspaceKeyProv, null);
 
 const showModal = ref(true);
 
@@ -19,13 +22,7 @@ onBeforeUnmount(() => {
   window.removeEventListener("keydown", listenKey);
 });
 
-type TRendePage = "documents" | "cards";
-
-const renderPage = ref<TRendePage>("cards");
-
-function changeRenderPage(page: TRendePage) {
-  renderPage.value = page;
-}
+const renderPage = ref<"documents" | "cards">("cards");
 </script>
 
 <template>
@@ -35,32 +32,38 @@ function changeRenderPage(page: TRendePage) {
       v-if="showModal"
     >
       <header class="text-lg font-semibold gap-4 text-center p-4">
-        <h4>{{ $route.params.area }}</h4>
+        <h4>{{ workspaceData?.name ?? "No Have workspace" }}</h4>
       </header>
-      <ul class="flex flex-col gap-4 pl-4">
+      <ul class="flex flex-col gap-4 pl-4" v-if="workspaceData">
         <li
-          page="cards"
           class="cursor-pointer flex flex-row gap-2"
-          @click="changeRenderPage('cards')"
+          tabindex="0"
+          @click="renderPage = 'cards'"
         >
           <CardsIcon class="h-5 w-5 fill-gray-600" />
           <span>Cards</span>
         </li>
         <li
-          page="notes"
           class="cursor-pointer flex flex-row gap-2"
-          @click="changeRenderPage('documents')"
+          tabindex="0"
+          @click="renderPage = 'documents'"
         >
           <BookIcon class="h-5 w-5 fill-gray-600" />
           <span>Docs</span>
         </li>
       </ul>
+      <div class="" v-else>
+        <button>Create a workspace</button>
+      </div>
     </aside>
     <section
       class="section-content h-full bg-white"
       :class="{ expanded: !showModal }"
     >
-      <StudyCards v-if="renderPage === 'cards'" />
+      <StudyCards
+        v-if="renderPage === 'cards'"
+        :workspace-name="workspaceData?.name"
+      />
       <div class="bg-orange-400" v-if="renderPage === 'documents'">NOTES</div>
     </section>
   </div>

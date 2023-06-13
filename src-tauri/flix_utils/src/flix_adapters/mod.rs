@@ -1,49 +1,64 @@
-use std::{fs, path::Path, rc::Rc};
+use std::path::{Path, PathBuf};
 
-use flix_data::{local_data, models::{open_db, card_model}};
-use rusqlite::Connection;
+use anyhow::Result;
+use flix_data::{local_data, models::card_model};
 
 mod anki;
+mod card_format;
 
 #[derive(Debug)]
 pub enum ImportType {
     Anki,
 }
 
-pub fn use_import_decks<P: AsRef<Path>>(import_type: ImportType, path: P) {
-    let mut directory = local_data::get_folder_path("decks").unwrap();
+pub fn use_import_deck<P: AsRef<Path>>(
+    import_type: ImportType,
+    path: P,
+    workspace: &str,
+) -> Result<PathBuf> {
+    let mut directory = local_data::get_folder_path("workspaces").unwrap();
 
-    let adapter_import_res = match import_type {
-        ImportType::Anki => anki::read_anki_files(path, &directory),
+    directory.push(workspace);
+
+    let (path, cards) = match import_type {
+        ImportType::Anki => anki::read_anki_files(path, &directory)?,
     };
+    directory.push(path);
 
-    match adapter_import_res {
-        Err(e) => {
-            eprintln!("Error adapter: {:?}", e);
-            return;
-        }
-        Ok((path, cards)) => {
-            directory.push(path);
-            let conn = open_db(directory.join("cards.db")).unwrap();
+    let conn = card_model::CardModel::open_connection(directory.join("cards.db"))
+        .unwrap()
+        .get_conn();
 
-            let model=card_model::CardModel::new(Rc::new(conn));
+    let mut connection = conn.borrow_mut();
 
-            for card in cards {
-                model.create(&card.text, "", card.audio_path, card.image_path).unwrap();
-            }
-        }
+    let transaction = connection.transaction()?;
+
+    for card in cards {
+        transaction.execute(
+            "INSERT INTO cards (front, back, text_items, text_format) VALUES (?1, ?2, ?3,?4)",
+            [
+                card.front_format,
+                card.back_format,
+                card.text_items,
+                card.items_format,
+            ],
+        )?;
     }
+    transaction.commit()?;
+
+    Ok(directory)
 }
 
 #[cfg(test)]
 mod import_test {
 
-    use super::{use_import_decks, ImportType};
+    use super::{use_import_deck, ImportType};
 
     #[test]
-    fn print_files() {
+    fn read_anki_files() {
         let path = "../.hidden/japanese.apkg";
-        let _res= use_import_decks(ImportType::Anki, path);
-        assert!(true); //FIXME: change this;
+        use_import_deck(ImportType::Anki, path, "japanese");
+        assert!(false); //FIXME: change this;
+                        // assert!(true);
     }
 }

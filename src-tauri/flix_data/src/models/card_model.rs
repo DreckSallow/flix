@@ -1,33 +1,82 @@
-use std::{path::Path, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, path::Path, rc::Rc};
 
 use rusqlite::{params, Connection, Result};
 
+use crate::card::Card;
+
 pub struct CardModel {
-    conn: Rc<Connection>,
+    conn: Rc<RefCell<Connection>>,
 }
 
 impl CardModel {
-    pub fn new(conn: Rc<Connection>) -> Self {
-        Self {
-            conn: Rc::clone(&conn),
-        }
+    pub fn open_connection<P: AsRef<Path>>(p: P) -> Result<Self> {
+        let conn = Connection::open(p)?;
+
+        conn.execute(
+            "
+            CREATE TABLE IF NOT EXISTS cards (
+                id INTEGER PRIMARY KEY,
+                text_items TEXT NOT NULL,
+                text_format TEXT NOT NULL,
+                front TEXT NOT NULL,
+                back TEXT NOT NULL
+            )",
+            [],
+        )?;
+
+        Ok(Self {
+            conn: Rc::new(RefCell::new(conn)),
+        })
+    }
+    pub fn new(conn: Rc<RefCell<Connection>>) -> Self {
+        Self { conn }
+    }
+    pub fn get_conn(&self) -> Rc<RefCell<Connection>> {
+        Rc::clone(&self.conn)
     }
 
-    pub fn create<P1: AsRef<Path>, P2: AsRef<Path>>(
+    pub fn create(
         &self,
         front: &str,
         back: &str,
-        audio: Option<P1>,
-        image: Option<P2>,
+        text_items: &str,
+        text_format: &str,
     ) -> Result<usize> {
-        self.conn.execute(
-            "INSERT INTO cards (front_text, back_text, audio, image) VALUES (?1, ?2, ?3, ?4)",
-            params![
-                front,
-                back,
-                audio.map(|p| p.as_ref().to_string_lossy().to_string()),
-                image.map(|p| p.as_ref().to_string_lossy().to_string()),
-            ],
-        )
+        self.conn.borrow().execute(
+            "INSERT INTO cards (front, back, text_items, text_format) VALUES (?1, ?2, ?3,?4)",
+            params![front, back, text_items, text_format],
+        )?;
+        Ok(self.conn.borrow().last_insert_rowid() as usize)
+    }
+
+    pub fn find_all(&self) -> Result<Vec<Card>> {
+        let conn = self.conn.borrow();
+        let mut smt = conn.prepare("SELECT * from cards")?;
+
+        let cards: Vec<Card> = smt
+            .query_map((), |r| {
+                let id: u32 = r.get(0)?;
+                let (text_items, text_format): (String, String) = (r.get(1)?, r.get(2)?);
+                let (front, back): (String, String) = (r.get(3)?, r.get(4)?);
+
+                let mut card_items = HashMap::new();
+
+                let items_card: Vec<&str> = text_items.split(0x1f as char).collect();
+
+                for (i, tfmt) in text_format.split(0x1f as char).enumerate() {
+                    card_items.insert(
+                        tfmt.to_owned(),
+                        items_card.get(i).unwrap_or(&"").to_string(),
+                    );
+                }
+
+                Ok(Card::new(id, card_items, front, back))
+            })?
+            .filter(|r| r.is_ok())
+            .map(|r| r.unwrap())
+            .collect();
+        // println!("cards: {:?}", &cards[0..5]);
+
+        Ok(cards)
     }
 }

@@ -96,7 +96,6 @@ textarea,
 select,
 button,
 label {
-  outline: none;
   font-family: inherit;
   font-size: inherit;
   -webkit-hyphens: auto;
