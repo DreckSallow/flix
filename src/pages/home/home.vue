@@ -5,7 +5,7 @@ import { sep } from "@tauri-apps/api/path";
 import { onBeforeUnmount, onMounted, provide, ref } from "vue";
 import { InputFocused } from "@components/inputs";
 import MenuContext from "@components/menu-context.vue";
-import StudyAreaPage from "../study-area/study-area.vue";
+import StudyAreaPage from "./study-area.vue";
 import { useWorkspaceProvider, workspaceKeyProv } from "./provider";
 
 const workspaces = ref<{ title: string }[]>([]);
@@ -207,9 +207,5 @@ aside.sidebar-main > ul {
 
 section.section-content {
   width: calc(100% - 74px);
-}
-
-li.selected {
-  /* border: 2px solid red; */
 }
 </style>

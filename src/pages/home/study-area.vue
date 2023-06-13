@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { inject, onBeforeUnmount, onMounted, ref } from "vue";
-import StudyCards from "./study-cards.vue";
 import { CardsIcon, BookIcon } from "@components/icons";
-import { workspaceKeyProv, type TWorkspaceProvide } from "../home/provider";
+import StudyCards from "./study-cards.vue";
+import { workspaceKeyProv, type TWorkspaceProvide } from "./provider";
 
 const workspaceData = inject<TWorkspaceProvide>(workspaceKeyProv, null);
 
