@@ -52,19 +52,31 @@ const renderPage = ref<"documents" | "cards">("cards");
           <span>Docs</span>
         </li>
       </ul>
-      <div class="" v-else>
-        <button>Create a workspace</button>
+      <div class="text-sm" v-else>
+        <button
+          class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
+          @click.stop="$emit('create-workspace')"
+        >
+          Create a workspace
+        </button>
       </div>
     </aside>
     <section
       class="section-content h-full bg-white"
       :class="{ expanded: !showModal }"
+      v-if="workspaceData"
     >
       <StudyCards
         v-if="renderPage === 'cards'"
         :workspace-name="workspaceData?.name"
       />
       <div class="bg-orange-400" v-if="renderPage === 'documents'">NOTES</div>
+    </section>
+    <section
+      v-else
+      class="section-content h-full bg-white grid place-content-center"
+    >
+      Does not have a workspace
     </section>
   </div>
 </template>

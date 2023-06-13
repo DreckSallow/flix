@@ -5,7 +5,7 @@ import { sep } from "@tauri-apps/api/path";
 import { vFocus } from "../../directives";
 import { Modal } from "@components/modals";
 import MenuContext from "@components/menu-context.vue";
-import StudyAreaPage from "./study-area.vue";
+import StudyArea from "./study-area.vue";
 import { useWorkspaceProvider, workspaceKeyProv } from "./provider";
 
 const workspaces = ref<{ title: string }[]>([]);
@@ -229,7 +229,7 @@ function setCurrentWorkspace(e: MouseEvent) {
     </div>
   </Modal>
   <section class="section-content h-full">
-    <StudyAreaPage />
+    <StudyArea @create-workspace="workspaceForm.show = true" />
   </section>
 </template>
 

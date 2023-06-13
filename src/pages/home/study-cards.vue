@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { ref, watchEffect } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { sep } from "@tauri-apps/api/path";
 import { IDeckResponse } from "../../types";
@@ -16,24 +16,21 @@ const props = defineProps<Props>();
 
 const decks = ref<IDeckResponse[]>([]);
 
-watch(
-  () => props.workspaceName,
-  () => {
-    if (!props.workspaceName) return;
-    invoke("get_decks_handler", {
-      workspaceName: props.workspaceName,
-    })
-      .then((d) => {
-        decks.value = d as Array<IDeckResponse>;
-      })
-      .catch((e) => {
-        console.error("study-area: ", e);
-      });
-  },
-  {
-    immediate: true,
+watchEffect(() => {
+  if (!props.workspaceName) {
+    decks.value = [];
+    return;
   }
-);
+  invoke("get_decks_handler", {
+    workspaceName: props.workspaceName,
+  })
+    .then((d) => {
+      decks.value = d as Array<IDeckResponse>;
+    })
+    .catch((e) => {
+      console.error("study-area: ", e);
+    });
+});
 
 const current_deck = ref<IDeckResponse | null>(null);
 
