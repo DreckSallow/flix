@@ -1,8 +1,10 @@
+use std::path::PathBuf;
+
 use flix_data::deck::Deck;
 use flix_utils::{
     create_deck, create_workspace,
     flix_adapters::{use_import_deck, ImportType},
-    get_deck, get_workspace_data, get_workspaces,
+    get_deck, get_workspace_data, get_workspaces, remove_workspace, rename_workspace,
 };
 
 #[tauri::command]
@@ -23,6 +25,16 @@ pub fn create_deck_handler(workspace_name: &str, deck_name: &str) -> Result<Deck
 #[tauri::command]
 pub fn create_workspace_handler(workspace_name: &str) -> Result<(), String> {
     create_workspace(workspace_name).or_else(|e| Err(e.to_string()))
+}
+
+#[tauri::command]
+pub fn remove_workspace_handler(workspace_name: &str) -> Result<PathBuf, String> {
+    remove_workspace(&workspace_name).or_else(|e| Err(e.to_string()))
+}
+
+#[tauri::command]
+pub fn rename_workspace_handler(workspace_name: &str, new_name: &str) -> Result<String, String> {
+    rename_workspace(workspace_name, new_name).or_else(|e| Err(e.to_string()))
 }
 
 #[tauri::command]

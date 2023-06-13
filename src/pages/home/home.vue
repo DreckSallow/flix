@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, provide, ref } from "vue";
-import { Modal } from "@components/modals";
+import { onBeforeUnmount, onMounted, provide, reactive, ref } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { sep } from "@tauri-apps/api/path";
 import { vFocus } from "../../directives";
+import { Modal } from "@components/modals";
 import MenuContext from "@components/menu-context.vue";
 import StudyAreaPage from "./study-area.vue";
 import { useWorkspaceProvider, workspaceKeyProv } from "./provider";
@@ -34,29 +34,61 @@ onBeforeUnmount(() => {
   document.querySelector("#app")?.classList.remove("flex", "flex-row");
 });
 
-const showModal = ref(false);
+type TWorkspaceForm = {
+  show: boolean;
+  inputs: { name: string };
+  type: "create" | "update";
+};
 
-const createWorkspaceValue = ref("");
+const workspaceForm = reactive<TWorkspaceForm>({
+  show: false,
+  inputs: {
+    name: "",
+  },
+  type: "create",
+});
 
-function create_workspace() {
-  invoke("create_workspace_handler", {
-    workspaceName: createWorkspaceValue.value,
+function createOrUpdate() {
+  if (workspaceForm.type === "create") {
+    invoke("create_workspace_handler", {
+      workspaceName: workspaceForm.inputs.name,
+    })
+      .then(() => {
+        workspaces.value.push({
+          title: workspaceForm.inputs.name,
+        });
+        workspaceProvider.setData({
+          name: workspaceForm.inputs.name,
+        });
+      })
+      .catch((e) => {
+        console.log("ERROR CREATING WORKSPACE: ", e);
+      })
+      .finally(() => {
+        workspaceForm.show = false;
+        workspaceForm.inputs.name = "";
+      });
+    return;
+  }
+  invoke<string>("rename_workspace_handler", {
+    workspaceName: workspaceInfo.value?.workspace,
+    newName: workspaceForm.inputs.name,
   })
-    .then(() => {
-      workspaces.value.push({
-        title: createWorkspaceValue.value,
-      });
-      workspaceProvider.setData({
-        name: createWorkspaceValue.value,
-      });
-      createWorkspaceValue.value = "";
+    .then((name) => {
+      const index = workspaces.value.findIndex(
+        ({ title }) => title === workspaceInfo.value?.workspace
+      );
+      workspaces.value[index] = {
+        title: name,
+      };
     })
     .catch((e) => {
       console.log("ERROR CREATING WORKSPACE: ", e);
     })
     .finally(() => {
-      showModal.value = false;
-      console.log("ERROR");
+      workspaceForm.show = false;
+      workspaceForm.inputs.name = "";
+      workspaceInfo.value = null;
     });
 }
 
@@ -79,35 +111,37 @@ function openContextMenu(e: MouseEvent) {
 }
 
 function selectContextMenu(type: "Remove" | "Rename") {
-  switch (type) {
-    case "Remove": {
-      invoke<string>("remove_workspace_handler", {
-        workspaceName: workspaceInfo.value?.workspace,
+  if (type === "Remove") {
+    invoke<string>("remove_workspace_handler", {
+      workspaceName: workspaceInfo.value?.workspace,
+    })
+      .then((p) => {
+        const name = p.split(sep).pop();
+        const workspaceFiltered = workspaces.value.filter(
+          ({ title }) => title != name
+        );
+        workspaces.value = workspaceFiltered;
+
+        if (workspaceFiltered.length > 0) {
+          workspaceProvider.setData({
+            name: workspaceFiltered[0].title,
+          });
+        } else {
+          workspaceProvider.setData(null);
+        }
       })
-        .then((p) => {
-          const name = p.split(sep).pop();
-          const workspaceFiltered = workspaces.value.filter(
-            ({ title }) => title != name
-          );
-          workspaces.value = workspaceFiltered;
+      .catch((e) => {
+        console.log("ERROR REMOVING CONTEXT: ", e);
+      });
+    workspaceInfo.value = null;
 
-          if (workspaceFiltered.length > 0) {
-            workspaceProvider.setData({
-              name: workspaceFiltered[0].title,
-            });
-          } else {
-            workspaceProvider.setData(null);
-          }
-        })
-        .catch((e) => {
-          console.log("ERROR REMOVING CONTEXT: ", e);
-        });
-    }
-    case "Rename": {
-    }
+    return;
   }
-
-  workspaceInfo.value = null;
+  if (type === "Rename") {
+    workspaceForm.show = true;
+    workspaceForm.type = "update";
+    workspaceForm.inputs.name = workspaceInfo.value?.workspace as string;
+  }
 }
 
 function setCurrentWorkspace(e: MouseEvent) {
@@ -152,6 +186,7 @@ function setCurrentWorkspace(e: MouseEvent) {
         top: workspaceInfo.mouse.y + 'px',
         left: workspaceInfo.mouse.x + 'px',
       }"
+      @close="workspaceInfo = null"
       class="rounded-md bg-gray-300 py-2 px-1"
       :options="[{ text: 'Remove' }, { text: 'Rename' }]"
       @select-opt="selectContextMenu"
@@ -159,34 +194,34 @@ function setCurrentWorkspace(e: MouseEvent) {
     <button
       tabindex="0"
       class="rounded-lg w-10 h-10 bg-white grid place-content-center cursor-pointer"
-      @click.stop="showModal = true"
-      @keyup.enter="showModal = true"
+      @click.stop="workspaceForm.show = true"
+      @keyup.enter="workspaceForm.show = true"
     >
       +
     </button>
   </aside>
-  <Modal @close="showModal = false" :show="showModal">
+  <Modal @close="workspaceForm.show = false" :show="workspaceForm.show">
     <div class="content-modal flex flex-col gap-2">
       <input
         v-focus
         class="border-b border-gray-600/80 border-solid p-1"
         type="text"
         tabindex="1"
-        v-model="createWorkspaceValue"
-        @keyup.enter="create_workspace"
+        v-model="workspaceForm.inputs.name"
+        @keyup.enter="createOrUpdate"
       />
       <div class="flex flex-row gap-4 justify-end">
         <button
           class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
           tabindex="2"
-          @click="create_workspace"
+          @click="createOrUpdate"
         >
           Ok
         </button>
         <button
           tabindex="3"
           class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
-          @click="showModal = false"
+          @click="workspaceForm.show = false"
         >
           Cancel
         </button>

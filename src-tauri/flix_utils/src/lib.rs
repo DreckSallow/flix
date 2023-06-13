@@ -79,6 +79,29 @@ pub fn create_deck(workspace_name: &str, deck_name: &str) -> Result<Deck> {
     Ok(Deck::new(deck_path))
 }
 
+pub fn remove_workspace(workspace_name: &str) -> Result<PathBuf> {
+    let mut workspaces_path =
+        get_folder_path("workspaces").ok_or_else(|| anyhow!("Folder workspace not found"))?;
+
+    workspaces_path.push(workspace_name);
+
+    fs::remove_dir_all(&workspaces_path)?;
+
+    Ok(workspaces_path)
+}
+
+pub fn rename_workspace(old_name: &str, new_name: &str) -> Result<String> {
+    let workspaces_path =
+        get_folder_path("workspaces").ok_or_else(|| anyhow!("Folder workspace not found"))?;
+
+    fs::rename(
+        workspaces_path.join(old_name),
+        workspaces_path.join(new_name),
+    )?;
+
+    Ok(new_name.into())
+}
+
 // pub fn create_card(deck_path: &str, front: &str, back: &str, text_items: &str) -> Result<Card> {
 //     let card_model = CardModel::open_connection(PathBuf::from(deck_path).join("cards.db"))?;
 //     // texto
