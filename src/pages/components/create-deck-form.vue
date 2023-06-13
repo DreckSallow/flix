@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { open } from "@tauri-apps/api/dialog";
 import { downloadDir } from "@tauri-apps/api/path";
-import { InputFocused } from "@components/inputs";
+import { InputFocused, InputFile } from "@components/inputs";
 import { ref } from "vue";
 
 const emit = defineEmits<{
@@ -81,19 +81,12 @@ async function getFileImport() {
           @keyup.enter="createDeck"
         />
       </div>
-      <div v-if="wayToCreate === 'import'" class="m-2">
-        <span
-          class="deck-import p-2 text-xs text-center block"
-          @click="getFileImport"
-        >
-          Select a file.
-          <br />
-          .APKG
-        </span>
-        <span class="block" v-if="importPathDeck">
-          {{ importPathDeck.split("\\").pop() || "nothing" }}
-        </span>
-      </div>
+      <InputFile
+        @open="getFileImport"
+        v-if="wayToCreate === 'import'"
+        text="Select a file .APKG"
+        :file="importPathDeck?.split('\\').pop() || ''"
+      />
 
       <div class="flex flex-row gap-4 justify-end mt-4">
         <button
@@ -106,8 +99,8 @@ async function getFileImport() {
         <button
           tabindex="3"
           class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
+          @click="$emit('cancel')"
         >
-          <!-- @click="showModal = false" -->
           Cancel
         </button>
       </div>
@@ -124,10 +117,5 @@ nav li {
 }
 nav li.selected {
   border-color: rgb(96, 165, 250);
-}
-
-span.deck-import {
-  border: 2px rgba(174, 172, 172, 0.589) dashed;
-  cursor: pointer;
 }
 </style>

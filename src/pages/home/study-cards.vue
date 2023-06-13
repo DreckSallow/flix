@@ -123,7 +123,11 @@ function createDeck(info: { pathFile?: string; name?: string }) {
     className="modal-container"
     :show="showModal"
   >
-    <CreateDeckForm :workspace-name="workspaceName" @deck-info="createDeck" />
+    <CreateDeckForm
+      :workspace-name="workspaceName"
+      @deck-info="createDeck"
+      @cancel="showModal = false"
+    />
   </Modal>
 </template>
 
