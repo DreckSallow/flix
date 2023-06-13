@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useOutClick } from "../hooks";
+
 type TOption = {
   text: string;
   id?: string | number;
@@ -13,6 +15,7 @@ defineProps<IProps>();
 
 const emit = defineEmits<{
   (e: "select-opt", id: string | number): void;
+  (e: "close"): void;
 }>();
 
 function selectOpt(e: MouseEvent) {
@@ -21,11 +24,18 @@ function selectOpt(e: MouseEvent) {
     emit("select-opt", el.getAttribute("opt-id") as string);
   }
 }
+
+const menuRef = useOutClick(() => {
+  emit("close");
+});
 </script>
 
 <template>
-  <div class="menu-container absolute z-99 text-sm">
-    <ul class="menu flex flex-col items-start rounded-lg" @click="selectOpt">
+  <div class="menu-container absolute z-99 text-sm" ref="menuRef">
+    <ul
+      class="menu flex flex-col items-start rounded-lg"
+      @click.stop="selectOpt"
+    >
       <li
         class="px-2 py-1 rounded-md"
         v-for="opt in options"

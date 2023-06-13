@@ -1,34 +1,17 @@
 <script lang="ts" setup>
+import { Transition } from "vue";
 import { CloseIcon } from "@components/icons";
-import { Transition, onBeforeUnmount, onMounted, ref } from "vue";
+import { useOutClick } from "../../hooks";
 
-const props = defineProps({
+defineProps({
   className: String,
   show: Boolean,
 });
 
 const emit = defineEmits(["close"]);
 
-const modalContent = ref<HTMLElement | null>(null);
-
-function onOutClick(ev: MouseEvent) {
-  if (!modalContent.value) {
-    return;
-  }
-  const target = ev.target as HTMLElement;
-
-  if (!modalContent.value.contains(target)) {
-    emit("close");
-  }
-}
-console.log(props);
-
-onMounted(() => {
-  document.addEventListener("click", onOutClick);
-});
-
-onBeforeUnmount(() => {
-  document.removeEventListener("click", onOutClick);
+const modalContent = useOutClick(() => {
+  emit("close");
 });
 </script>
 
