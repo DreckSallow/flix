@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted, provide, ref } from "vue";
 import { Modal } from "@components/modals";
 import { invoke } from "@tauri-apps/api";
 import { sep } from "@tauri-apps/api/path";
-import { onBeforeUnmount, onMounted, provide, ref } from "vue";
-import { InputFocused } from "@components/inputs";
+import { vFocus } from "../../directives";
 import MenuContext from "@components/menu-context.vue";
 import StudyAreaPage from "./study-area.vue";
 import { useWorkspaceProvider, workspaceKeyProv } from "./provider";
@@ -167,10 +167,12 @@ function setCurrentWorkspace(e: MouseEvent) {
   </aside>
   <Modal @close="showModal = false" :show="showModal">
     <div class="content-modal flex flex-col gap-2">
-      <InputFocused
+      <input
+        v-focus
+        class="border-b border-gray-600/80 border-solid p-1"
         type="text"
         tabindex="1"
-        v-model:value="createWorkspaceValue"
+        v-model="createWorkspaceValue"
         @keyup.enter="create_workspace"
       />
       <div class="flex flex-row gap-4 justify-end">

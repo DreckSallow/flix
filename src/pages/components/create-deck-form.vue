@@ -1,8 +1,9 @@
 <script lang="ts" setup>
+import { ref } from "vue";
 import { open } from "@tauri-apps/api/dialog";
 import { downloadDir } from "@tauri-apps/api/path";
-import { InputFocused, InputFile } from "@components/inputs";
-import { ref } from "vue";
+import { InputFile } from "@components/inputs";
+import { vFocus } from "../../directives";
 
 const emit = defineEmits<{
   (
@@ -73,11 +74,12 @@ async function getFileImport() {
     </nav>
     <main class="text-sm min-w-36">
       <div v-if="wayToCreate === 'create'">
-        <InputFocused
+        <input
+          v-focus
           class="border border-gray-600/80 border-solid rounded-md p-1"
           type="text"
           tabindex="1"
-          v-model:value="newDeckName"
+          v-model="newDeckName"
           @keyup.enter="createDeck"
         />
       </div>
