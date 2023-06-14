@@ -8,6 +8,8 @@ import { Modal } from "@components/modals";
 import DeckSection from "./deck-section.vue";
 import CreateDeckForm from "../components/create-deck-form.vue";
 
+//TODO: add create card functionality
+
 interface Props {
   workspaceName?: string;
 }
@@ -108,12 +110,15 @@ function createDeck(info: { pathFile?: string; name?: string }) {
       </li>
     </ul>
     <DeckSection
-      v-if="current_deck"
+      v-if="current_deck && current_deck.cards.length > 0"
       :cards="current_deck.cards"
       :deck-path="current_deck.path"
       :index="0"
       @finish-deck="current_deck = null"
     />
+    <div class="w-full h-full grid content-center" v-else-if="current_deck">
+      <p class="text-center">NO HAVE CARDS</p>
+    </div>
   </div>
   <Modal
     @close="showModal = false"
