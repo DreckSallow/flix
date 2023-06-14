@@ -16,7 +16,7 @@ provide(workspaceKeyProv, workspaceProvider.workspaceData);
 
 onMounted(() => {
   document.querySelector("#app")?.classList.add("flex", "flex-row");
-  invoke<string[]>("workspaces_handler")
+  invoke<string[]>("get_workspaces_handler")
     .then((workList) => {
       workspaces.value = workList.map((s) => ({ title: s }));
       if (workList.length > 0) {

@@ -16,18 +16,18 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const decks = ref<IDeckResponse[]>([]);
+const decks = ref<string[]>([]);
 
 watchEffect(() => {
   if (!props.workspaceName) {
     decks.value = [];
     return;
   }
-  invoke("get_decks_handler", {
+  invoke<string[]>("get_decks_handler", {
     workspaceName: props.workspaceName,
   })
     .then((d) => {
-      decks.value = d as Array<IDeckResponse>;
+      decks.value = d;
     })
     .catch((e) => {
       console.error("study-area: ", e);
@@ -35,6 +35,32 @@ watchEffect(() => {
 });
 
 const current_deck = ref<IDeckResponse | null>(null);
+
+function loadDeck(deckName: string) {
+  if (!props.workspaceName) {
+    return;
+  }
+  invoke<IDeckResponse>("get_deck_handler", {
+    workspaceName: props.workspaceName,
+    deckName,
+  })
+    .then((d) => {
+      current_deck.value = d;
+    })
+    .catch((e) => {
+      console.log("ERROR LOADING DECK: ", e);
+    });
+}
+
+function onLoadDeck(e: MouseEvent) {
+  const target = e.target as HTMLElement | null;
+  if (target && target.tagName === "LI") {
+    const deckName = target.getAttribute("deck-name");
+    if (deckName) {
+      loadDeck(deckName);
+    }
+  }
+}
 
 const showModal = ref(false);
 
@@ -45,18 +71,19 @@ function createDeck(info: { pathFile?: string; name?: string }) {
     return;
   }
 
-  if (decks.value.some(({ name }) => name === newDeckName)) {
+  if (decks.value.some((name) => name === newDeckName)) {
     //TODO: Warn to the user about this mistake
     return;
   }
 
   if (info.pathFile) {
-    invoke("import_deck_handler", {
+    invoke<IDeckResponse>("import_deck_handler", {
       workspaceName: props.workspaceName,
-      deckPath: info.pathFile,
+      filePath: info.pathFile,
     })
       .then((deck) => {
-        decks.value.push(deck as IDeckResponse);
+        decks.value.push(deck.name);
+        current_deck.value = deck;
       })
       .catch((e) => {
         console.log("CREATE DECK ERROR: ", e);
@@ -65,12 +92,13 @@ function createDeck(info: { pathFile?: string; name?: string }) {
         showModal.value = false;
       });
   } else if (info.name) {
-    invoke("create_deck_handler", {
+    invoke<IDeckResponse>("create_deck_handler", {
       workspaceName: props.workspaceName,
       deckName: newDeckName,
     })
       .then((deck) => {
-        decks.value.push(deck as IDeckResponse);
+        decks.value.push(deck.name);
+        current_deck.value = deck;
       })
       .catch((e) => {
         console.log("CREATE DECK ERROR: ", e);
@@ -91,14 +119,18 @@ function createDeck(info: { pathFile?: string; name?: string }) {
     >
       <ArrowIcon class="h-5 w-10 fill-gray-600" direction="left" />
     </span>
-    <ul class="h-full w-full flex flex-center gap-4" v-if="!current_deck">
+    <ul
+      class="h-full w-full flex flex-center gap-4"
+      v-if="!current_deck"
+      @click="onLoadDeck"
+    >
       <li
         class="deck-card p-4 bg-blue-400 text-white cursor-pointer rounded-md"
-        v-for="deck in decks"
+        v-for="deckName in decks"
         tabindex="0"
-        @click="current_deck = deck"
+        :deck-name="deckName"
       >
-        {{ deck.name }}
+        {{ deckName }}
       </li>
       <li
         class="deck-card p-4 bg-blue-400 text-white cursor-pointer rounded-md"
