@@ -1,49 +1,49 @@
 use std::path::PathBuf;
 
 use flix_data::deck::Deck;
-use flix_utils::{
-    create_deck, create_workspace,
-    flix_adapters::{use_import_deck, ImportType},
-    get_deck, get_workspace_data, get_workspaces, remove_workspace, rename_workspace,
-};
+use flix_utils::{flix_adapters::ImportType, handlers};
 
 #[tauri::command]
-pub fn workspaces_handler() -> Result<Vec<String>, String> {
-    get_workspaces().or_else(|e| Err(e.to_string()))
+pub fn get_workspaces_handler() -> Result<Vec<String>, String> {
+    handlers::workspace::get_workspaces().or_else(|e| Err(e.to_string()))
 }
 
 #[tauri::command]
-pub fn get_decks_handler(workspace_name: String) -> Result<Vec<Deck>, String> {
-    get_workspace_data(&workspace_name).or_else(|e| Err(e.to_string()))
-}
-
-#[tauri::command]
-pub fn create_deck_handler(workspace_name: &str, deck_name: &str) -> Result<Deck, String> {
-    create_deck(&workspace_name, &deck_name).or_else(|e| Err(e.to_string()))
-}
-
-#[tauri::command]
-pub fn create_workspace_handler(workspace_name: &str) -> Result<(), String> {
-    create_workspace(workspace_name).or_else(|e| Err(e.to_string()))
+pub fn create_workspace_handler(workspace_name: &str) -> Result<PathBuf, String> {
+    handlers::workspace::create_workspace(workspace_name).or_else(|e| Err(e.to_string()))
 }
 
 #[tauri::command]
 pub fn remove_workspace_handler(workspace_name: &str) -> Result<PathBuf, String> {
-    remove_workspace(&workspace_name).or_else(|e| Err(e.to_string()))
+    handlers::workspace::remove_workspace(workspace_name).or_else(|e| Err(e.to_string()))
 }
 
 #[tauri::command]
-pub fn rename_workspace_handler(workspace_name: &str, new_name: &str) -> Result<String, String> {
-    rename_workspace(workspace_name, new_name).or_else(|e| Err(e.to_string()))
+pub fn rename_workspace_handler(workspace_name: &str, new_name: &str) -> Result<PathBuf, String> {
+    handlers::workspace::rename_workspace(workspace_name, new_name).or_else(|e| Err(e.to_string()))
 }
 
 #[tauri::command]
-pub async fn import_deck_handler(workspace_name: &str, deck_path: &str) -> Result<Deck, String> {
+pub fn get_decks_handler(workspace_name: &str) -> Result<Vec<String>, String> {
+    handlers::deck::get_decks(workspace_name).or_else(|e| Err(e.to_string()))
+}
+
+#[tauri::command]
+pub fn create_deck_handler(workspace_name: &str, deck_name: &str) -> Result<Deck, String> {
+    handlers::deck::create_deck(workspace_name, deck_name).or_else(|e| Err(e.to_string()))
+}
+
+#[tauri::command]
+pub fn get_deck_handler(workspace_name: &str, deck_name: &str) -> Result<Deck, String> {
+    handlers::deck::get_deck(workspace_name, deck_name).or_else(|e| Err(e.to_string()))
+}
+
+///TODO: return only the deck name
+#[tauri::command]
+pub async fn import_deck_handler(workspace_name: &str, file_path: &str) -> Result<Deck, String> {
     //FIXME: change the static import type
-    let deck_path = use_import_deck(ImportType::Anki, deck_path, workspace_name)
-        .or_else(|e| Err(e.to_string()))?;
-
-    get_deck(deck_path).or_else(|e| Err(e.to_string()))
+    handlers::deck::import_deck(ImportType::Anki, PathBuf::from(file_path), workspace_name)
+        .or_else(|e| Err(e.to_string()))
 }
 
 // #[tauri::command]

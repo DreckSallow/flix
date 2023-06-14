@@ -4,16 +4,18 @@
 mod handlers;
 
 use handlers::{
-    create_deck_handler, create_workspace_handler, get_decks_handler, import_deck_handler,
-    remove_workspace_handler, rename_workspace_handler, workspaces_handler,
+    create_deck_handler, create_workspace_handler, get_deck_handler, get_decks_handler,
+    get_workspaces_handler, import_deck_handler, remove_workspace_handler,
+    rename_workspace_handler,
 };
 
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            workspaces_handler,
+            get_workspaces_handler,
             get_decks_handler,
             create_deck_handler,
+            get_deck_handler,
             create_workspace_handler,
             import_deck_handler,
             remove_workspace_handler,
