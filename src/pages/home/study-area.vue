@@ -3,6 +3,7 @@ import { inject, onBeforeUnmount, onMounted, ref } from "vue";
 import { CardsIcon, BookIcon } from "@components/icons";
 import StudyCards from "./study-cards.vue";
 import { workspaceKeyProv, type TWorkspaceProvide } from "./provider";
+import StudyDocs from "./study-docs.vue";
 
 const workspaceData = inject<TWorkspaceProvide>(workspaceKeyProv, null);
 
@@ -70,7 +71,7 @@ const renderPage = ref<"documents" | "cards">("cards");
         v-if="renderPage === 'cards'"
         :workspace-name="workspaceData?.name"
       />
-      <div class="bg-orange-400" v-if="renderPage === 'documents'">NOTES</div>
+      <StudyDocs v-if="renderPage === 'documents'" />
     </section>
     <section
       v-else
