@@ -1,46 +1,124 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, ref, watchEffect, reactive } from "vue";
+import { invoke } from "@tauri-apps/api";
 import styles from "./markdown.module.css";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
-import { ArrowIcon, EditIcon, ReadIcon } from "@components/icons";
+import {
+  ArrowIcon,
+  CloseIcon,
+  EditIcon,
+  ReadIcon,
+  CheckIcon,
+} from "@components/icons";
 import MarkdownEditor from "@components/markdown-editor.vue";
+import { useCheckInput } from "../../hooks/index";
 
-interface Doc {
-  title: string;
-  content: string;
+interface IProps {
+  workspaceName: string;
 }
 
-const docs = ref<Doc[]>([]);
+const props = defineProps<IProps>();
 
-const currentDoc = ref<Doc | null>(null);
+interface INote extends INoteInfo {
+  text: string;
+}
+
+interface INoteInfo {
+  id: number;
+  title: string;
+}
+
+const docs = ref<INoteInfo[]>([]);
+
+const currentDoc = ref<INote | null>(null);
 
 const typeRenderDoc = ref<"write" | "read">("read");
 
+const docTitleInput = useCheckInput("");
+const docTextInput = useCheckInput("");
+
+const inputsChanged = reactive({
+  title: false,
+  text: false,
+});
+
+docTitleInput.onInput((titleInput) => {
+  if (!inputsChanged.title) {
+    inputsChanged.title = titleInput !== currentDoc.value?.title;
+  }
+});
+
+docTextInput.onInput((textInput) => {
+  if (!inputsChanged.text) {
+    inputsChanged.text = textInput !== currentDoc.value?.text;
+  }
+});
+
+watchEffect(() => {
+  invoke<{ [k: number]: string }>("get_notes_info", {
+    workspaceName: props.workspaceName,
+  })
+    .then((data) => {
+      const docs_data: INoteInfo[] = Object.entries(data).map(([k, v]) => ({
+        id: Number(k),
+        title: v,
+      }));
+
+      docs.value = docs_data;
+    })
+    .catch((e) => {
+      console.log("ERROR: GETTING NOTES", e);
+    });
+});
+
+function setCurrentDoc(doc: INote | null) {
+  currentDoc.value = doc;
+  if (doc) {
+    console.log("title: ", doc.title);
+    docTitleInput.set(doc.title);
+    docTextInput.set(doc.text);
+  }
+}
+
 function createDoc() {
-  const newDock: Doc = {
+  invoke<INote>("create_note", {
+    workspaceName: props.workspaceName,
     title: "Empty Doc",
-    content: "Hello\n\n```javascript\nlet x = 'y'\n```",
-  };
-  docs.value.push(newDock);
-  currentDoc.value = { ...newDock };
+    text: "",
+  })
+    .then((newDoc) => {
+      docs.value.push(newDoc);
+      setCurrentDoc({ ...newDoc });
+    })
+    .catch((e) => {
+      console.log("ERROR creating doc: ", e);
+    });
 }
 
 function selectDoc(e: MouseEvent) {
   const el = e.target as HTMLElement | null;
   if (el && el.tagName === "LI") {
-    //FIXME: change for Id (beacuse the doc can been duplicate)
-    const dockTitle = el.getAttribute("doc-title");
-    if (dockTitle) {
-      currentDoc.value =
-        docs.value.find(({ title }) => title === dockTitle) ?? null;
+    const docId = el.getAttribute("doc-id");
+    if (docId) {
+      invoke<INote>("get_one_note", {
+        workspaceName: props.workspaceName,
+        id: Number(docId),
+      })
+        .then((data) => {
+          console.log("SET current Doc");
+          setCurrentDoc(data);
+        })
+        .catch((e) => {
+          console.log("ERROR select doc: ", e);
+        });
     }
   }
 }
 
 const docParsed = computed(() => {
   return currentDoc.value
-    ? micromark(currentDoc.value.content, {
+    ? micromark(docTextInput.input.value, {
         extensions: [gfm()],
         htmlExtensions: [gfmHtml()],
       })
@@ -50,6 +128,35 @@ const docParsed = computed(() => {
 function toggleRenderType() {
   const newType = typeRenderDoc.value === "read" ? "write" : "read";
   typeRenderDoc.value = newType;
+}
+
+function saveDoc() {
+  if (!currentDoc.value) return;
+  const newDataDoc: { [k: string]: string } = {};
+
+  if (inputsChanged.text) newDataDoc.text = docTextInput.input.value;
+  if (inputsChanged.title) newDataDoc.title = docTitleInput.input.value;
+  if (!newDataDoc.text && !newDataDoc.title) return;
+
+  invoke<INote>("update_note", {
+    workspaceName: props.workspaceName,
+    id: currentDoc.value.id,
+    title: newDataDoc.title,
+    text: newDataDoc.text,
+  })
+    .then(({ title }) => {
+      const index = docs.value.findIndex(
+        ({ id }) => id == currentDoc.value?.id
+      );
+      if (index != -1) {
+        docs.value[index].title = title;
+      }
+      if (inputsChanged.text) inputsChanged.text = false;
+      if (inputsChanged.title) inputsChanged.title = false;
+    })
+    .catch((e) => {
+      console.log("ERROR SAVING CONTENT: ", e);
+    });
 }
 </script>
 
@@ -68,7 +175,7 @@ function toggleRenderType() {
       <li
         class="deck-card p-4 bg-blue-400 text-white cursor-pointer rounded-md"
         v-for="doc in docs"
-        :doc-title="doc.title"
+        :doc-id="doc.id"
       >
         {{ doc.title }}
       </li>
@@ -85,9 +192,14 @@ function toggleRenderType() {
         <span class="cursor-pointer flex-center" @click="currentDoc = null">
           <ArrowIcon class="h-5 w-10 fill-gray-600" direction="left" />
         </span>
-        <div class="flex flex-row">
-          <h4>{{ currentDoc.title }}</h4>
-          <button @click="toggleRenderType" class="cursor-pointer">
+        <div>
+          <input
+            v-model="docTitleInput.input.value"
+            class="w-max"
+            @blur="saveDoc"
+            @keyup.enter="saveDoc"
+          />
+          <button @click="toggleRenderType" class="cursor-pointer w-max">
             <EditIcon
               v-if="typeRenderDoc === 'read'"
               class="h-5 w-5 fill-gray-600"
@@ -97,12 +209,26 @@ function toggleRenderType() {
               class="h-5 w-5 fill-gray-600"
             />
           </button>
+          <button
+            @click="saveDoc"
+            class="rounded-full border-solid border-2 w-max cursor-pointer"
+            :class="{
+              'border-green-600': !inputsChanged.text,
+              'border-red-600': inputsChanged.text,
+            }"
+          >
+            <CheckIcon
+              v-if="!inputsChanged.text"
+              class="fill-green-600 h-5 w-5"
+            />
+            <CloseIcon v-else class="fill-red-600 h-5 w-5" />
+          </button>
         </div>
       </header>
       <main class="h-full w-full overflow-auto">
         <MarkdownEditor
-          v-model:content="currentDoc.content"
-          class="w-full h-full"
+          v-model:content="docTextInput.input.value"
+          class="w-full h-full text-lg"
           v-if="typeRenderDoc === 'write'"
         />
         <div
@@ -135,6 +261,10 @@ section.doc-container main {
 
 section.doc-container header > div {
   display: grid;
-  grid-template-columns: 1fr 80px;
+  grid-template-columns: 1fr 70px 70px;
 }
+
+/* section.doc-container header button {
+  width: ;
+} */
 </style>

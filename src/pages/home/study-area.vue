@@ -71,7 +71,10 @@ const renderPage = ref<"documents" | "cards">("cards");
         v-if="renderPage === 'cards'"
         :workspace-name="workspaceData?.name"
       />
-      <StudyDocs v-if="renderPage === 'documents'" />
+      <StudyDocs
+        v-if="renderPage === 'documents'"
+        :workspace-name="workspaceData?.name"
+      />
     </section>
     <section
       v-else
