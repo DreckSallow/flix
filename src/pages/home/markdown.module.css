@@ -57,6 +57,7 @@ h2::after {
 
 .markdown p {
   margin: 16px 0;
+  font-size: 1rem;
 }
 
 .markdown a {
