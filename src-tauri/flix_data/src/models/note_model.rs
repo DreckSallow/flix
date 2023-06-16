@@ -1,4 +1,4 @@
-use std::{cell::RefCell, path::Path, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, path::Path, rc::Rc};
 
 use rusqlite::{Connection, Result};
 
@@ -17,7 +17,7 @@ impl NoteModel {
             CREATE TABLE IF NOT EXISTS notes (
                 id INTEGER PRIMARY KEY,
                 title TEXT NOT NULL,
-                text TEXT NOT NULL,
+                text TEXT NOT NULL
             )",
             [],
         )?;
@@ -47,6 +47,25 @@ impl NoteModel {
             })
     }
 
+    pub fn get_notes_info(&self) -> Result<HashMap<u32, String>> {
+        let connection = self.conn.borrow();
+        let mut stmt = connection.prepare("SELECT id, title FROM notes")?;
+
+        let mut notes_info = HashMap::new();
+
+        stmt.query_map([], |r| {
+            let info: (u32, String) = (r.get(0)?, r.get(1)?);
+            Ok(info)
+        })?
+        .for_each(|info| {
+            if let Ok((id, title)) = info {
+                notes_info.insert(id, title);
+            }
+        });
+
+        Ok(notes_info)
+    }
+
     pub fn delete_one(&self, id: u32) -> Result<Note> {
         let note = self.find_by_id(id)?;
         self.conn
@@ -56,7 +75,7 @@ impl NoteModel {
     }
 
     pub fn update_one(&self, id: u32, text: Option<&str>, title: Option<&str>) -> Result<Note> {
-        let mut sql = String::from("UPDATE notas SET");
+        let mut sql = String::from("UPDATE notes SET");
         let mut params: Vec<&dyn rusqlite::ToSql> = Vec::new();
 
         if let Some(title) = &title {
@@ -66,7 +85,7 @@ impl NoteModel {
         }
 
         if let Some(content) = &text {
-            sql.push_str(" content = ?,");
+            sql.push_str(" text = ?,");
             params.push(content);
         }
 
