@@ -1,6 +1,6 @@
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 
-use flix_data::deck::Deck;
+use flix_data::{deck::Deck, note::Note};
 use flix_utils::{flix_adapters::ImportType, handlers};
 
 #[tauri::command]
@@ -44,6 +44,36 @@ pub async fn import_deck_handler(workspace_name: &str, file_path: &str) -> Resul
     //FIXME: change the static import type
     handlers::deck::import_deck(ImportType::Anki, PathBuf::from(file_path), workspace_name)
         .or_else(|e| Err(e.to_string()))
+}
+
+#[tauri::command]
+pub async fn create_note(workspace_name: &str, title: &str, text: &str) -> Result<Note, String> {
+    handlers::note::create_note(workspace_name, title, text).or_else(|e| Err(e.to_string()))
+}
+
+#[tauri::command]
+pub async fn get_notes_info(workspace_name: &str) -> Result<HashMap<u32, String>, String> {
+    handlers::note::get_notes_info(workspace_name).or_else(|e| Err(e.to_string()))
+}
+
+#[tauri::command]
+pub async fn delete_one_note(workspace_name: &str, id: u32) -> Result<Note, String> {
+    handlers::note::delete_one(workspace_name, id).or_else(|e| Err(e.to_string()))
+}
+
+#[tauri::command]
+pub async fn get_one_note(workspace_name: &str, id: u32) -> Result<Note, String> {
+    handlers::note::find_by_id(workspace_name, id).or_else(|e| Err(e.to_string()))
+}
+
+#[tauri::command]
+pub async fn update_note(
+    workspace_name: &str,
+    id: u32,
+    title: Option<&str>,
+    text: Option<&str>,
+) -> Result<Note, String> {
+    handlers::note::update_one(workspace_name, id, text, title).or_else(|e| Err(e.to_string()))
 }
 
 // #[tauri::command]

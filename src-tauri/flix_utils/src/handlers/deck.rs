@@ -14,6 +14,11 @@ pub fn get_decks(workspace_name: &str) -> Result<Vec<String>> {
 
     fs::read_dir(workspace_path)?.for_each(|entry| {
         if let Ok(f) = entry {
+            if let Ok(file_type) = f.file_type() {
+                if file_type.is_file() {
+                    return;
+                }
+            }
             if let Ok(name) = f.file_name().into_string() {
                 decks_paths.push(name);
             }

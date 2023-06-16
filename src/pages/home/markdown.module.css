@@ -1,0 +1,191 @@
+/*
+  Styles for markdown parsed
+*/
+
+.markdown {
+  font-size: 1.6rem;
+  line-height: 1.6;
+  padding: 16px;
+  padding-top: 0;
+}
+
+.markdown img {
+  vertical-align: middle;
+  max-width: 35%;
+}
+
+.markdown h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+}
+
+.markdown h1::after,
+h2::after {
+  content: "";
+  display: block;
+  position: relative;
+  top: 0.2em;
+  border-bottom: 1px solid hsla(0, 0%, 50%, 0.33);
+}
+
+.markdown h1 {
+  font-size: 2.5rem;
+  margin-top: 0.6em;
+  margin-bottom: 0.8em;
+}
+.markdown h2 {
+  font-size: 2rem;
+  margin-top: 0.6em;
+  margin-bottom: 0.8em;
+}
+.markdown h3 {
+  font-size: 1.7rem;
+}
+.markdown h4 {
+  font-size: 1.5rem;
+}
+.markdown h5 {
+  font-size: 1.25rem;
+}
+.markdown h6 {
+  font-size: 1rem;
+}
+
+.markdown p {
+  margin: 16px 0;
+}
+
+.markdown a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.markdown a:hover {
+  text-decoration: underline;
+}
+
+.markdown pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f6f8fa;
+  border-radius: 3px;
+}
+
+.markdown code {
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier,
+    monospace;
+  font-size: 85%;
+  background-color: rgba(27, 31, 35, 0.05);
+  padding: 0.2em 0.4em;
+  border-radius: 8px;
+}
+
+.markdown pre code {
+  background-color: unset;
+}
+
+.markdown blockquote {
+  margin: 0;
+  padding: 0 1em;
+  color: #6a737d;
+  border-left: 0.25em solid #dfe2e5;
+}
+
+.markdown li {
+  list-style-type: unset;
+}
+
+.markdown ul,
+ol {
+  padding-left: 1.5em;
+}
+
+.markdown strong {
+  font-weight: bold;
+}
+
+.markdown em {
+  font-style: italic;
+}
+
+.markdown del {
+  text-decoration: line-through;
+}
+
+.markdown hr {
+  border: 0;
+  border-top: 1px solid #dfe2e5;
+  margin: 24px 0;
+}
+
+/* Table style */
+.markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+}
+
+/* Table header */
+.markdown th {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+/* Table rows */
+.markdown td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+/* Alternating row colors */
+.markdown tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Hover effect on rows */
+.markdown tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Responsive table */
+@media screen and (max-width: 600px) {
+  .markdown table {
+    border: 0;
+  }
+
+  .markdown table thead {
+    display: none;
+  }
+
+  .markdown table tr {
+    margin-bottom: 10px;
+    display: block;
+    border: 1px solid #ddd;
+  }
+
+  .markdown table td {
+    display: block;
+    text-align: right;
+    font-size: 13px;
+    border-bottom: 1px dotted #ddd;
+  }
+
+  .markdown table td:before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+}
