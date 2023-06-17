@@ -7,6 +7,7 @@ import { ArrowIcon } from "@components/icons";
 import { Modal } from "@components/modals";
 import DeckSection from "./deck-section.vue";
 import CreateDeckForm from "../components/create-deck-form.vue";
+import { NotifyState } from "../../state";
 
 //TODO: add create card functionality
 
@@ -30,7 +31,11 @@ watchEffect(() => {
       decks.value = d;
     })
     .catch((e) => {
-      console.error("study-area: ", e);
+      NotifyState.notify({
+        title: "Decks Error",
+        content: "Error gettign the decks of " + props.workspaceName,
+        type: "error",
+      });
     });
 });
 
@@ -48,7 +53,11 @@ function loadDeck(deckName: string) {
       current_deck.value = d;
     })
     .catch((e) => {
-      console.log("ERROR LOADING DECK: ", e);
+      NotifyState.notify({
+        title: "Get the deck info",
+        content: "Error while get the deck info: " + deckName,
+        type: "error",
+      });
     });
 }
 
@@ -72,7 +81,11 @@ function createDeck(info: { pathFile?: string; name?: string }) {
   }
 
   if (decks.value.some((name) => name === newDeckName)) {
-    //TODO: Warn to the user about this mistake
+    NotifyState.notify({
+      title: "Rename Deck",
+      content: "The deck '" + newDeckName + "' already exists",
+      type: "alert",
+    });
     return;
   }
 
@@ -86,7 +99,11 @@ function createDeck(info: { pathFile?: string; name?: string }) {
         current_deck.value = deck;
       })
       .catch((e) => {
-        console.log("CREATE DECK ERROR: ", e);
+        NotifyState.notify({
+          title: "Import deck",
+          content: "An error ocurred when importing a file",
+          type: "error",
+        });
       })
       .finally(() => {
         showModal.value = false;
@@ -101,7 +118,11 @@ function createDeck(info: { pathFile?: string; name?: string }) {
         current_deck.value = deck;
       })
       .catch((e) => {
-        console.log("CREATE DECK ERROR: ", e);
+        NotifyState.notify({
+          title: "Create deck",
+          content: "An error ocurred while create a deck",
+          type: "error",
+        });
       })
       .finally(() => {
         showModal.value = false;

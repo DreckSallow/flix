@@ -13,6 +13,7 @@ import {
 } from "@components/icons";
 import MarkdownEditor from "@components/markdown-editor.vue";
 import { useCheckInput } from "../../hooks/index";
+import { NotifyState } from "../../state";
 
 interface IProps {
   workspaceName: string;
@@ -68,7 +69,11 @@ watchEffect(() => {
       docs.value = docs_data;
     })
     .catch((e) => {
-      console.log("ERROR: GETTING NOTES", e);
+      NotifyState.notify({
+        title: "Notes info",
+        content: "Error getting the notes",
+        type: "error",
+      });
     });
 });
 
@@ -92,7 +97,11 @@ function createDoc() {
       setCurrentDoc({ ...newDoc });
     })
     .catch((e) => {
-      console.log("ERROR creating doc: ", e);
+      NotifyState.notify({
+        title: "Create a note",
+        content: "Error creating a note",
+        type: "error",
+      });
     });
 }
 
@@ -110,7 +119,11 @@ function selectDoc(e: MouseEvent) {
           setCurrentDoc(data);
         })
         .catch((e) => {
-          console.log("ERROR select doc: ", e);
+          NotifyState.notify({
+            title: "Select Note",
+            content: "The note not exist",
+            type: "error",
+          });
         });
     }
   }
@@ -155,7 +168,11 @@ function saveDoc() {
       if (inputsChanged.title) inputsChanged.title = false;
     })
     .catch((e) => {
-      console.log("ERROR SAVING CONTENT: ", e);
+      NotifyState.notify({
+        title: "Save Note",
+        content: "An error ocurred saving a note",
+        type: "error",
+      });
     });
 }
 </script>

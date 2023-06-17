@@ -4,6 +4,7 @@ import { open } from "@tauri-apps/api/dialog";
 import { downloadDir } from "@tauri-apps/api/path";
 import { InputFile } from "@components/inputs";
 import { vFocus } from "../../directives";
+import { NotifyState } from "../../state";
 
 const emit = defineEmits<{
   (
@@ -43,7 +44,11 @@ async function getFileImport() {
       importPathDeck.value = pathfile as string;
     }
   } catch (e) {
-    console.log("ERROR ", e);
+    NotifyState.notify({
+      content: "Error importing into Flix",
+      title: "Importing file",
+      type: "error",
+    });
   }
 }
 </script>

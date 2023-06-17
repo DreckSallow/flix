@@ -7,6 +7,7 @@ import { Modal } from "@components/modals";
 import MenuContext from "@components/menu-context.vue";
 import StudyArea from "./study-area.vue";
 import { useWorkspaceProvider, workspaceKeyProv } from "./provider";
+import { NotifyState } from "../../state";
 
 const workspaces = ref<{ title: string }[]>([]);
 
@@ -26,7 +27,11 @@ onMounted(() => {
       }
     })
     .catch((e) => {
-      console.log("Error: ", e);
+      NotifyState.notify({
+        title: "Workspaces Error",
+        content: "Error getting workspaces",
+        type: "error",
+      });
     });
 });
 
@@ -62,7 +67,12 @@ function createOrUpdate() {
         });
       })
       .catch((e) => {
-        console.log("ERROR CREATING WORKSPACE: ", e);
+        NotifyState.notify({
+          title: "Create workspaces",
+          content:
+            "Error while create " + workspaceForm.inputs.name + " workspace",
+          type: "error",
+        });
       })
       .finally(() => {
         workspaceForm.show = false;
@@ -74,16 +84,20 @@ function createOrUpdate() {
     workspaceName: workspaceInfo.value?.workspace,
     newName: workspaceForm.inputs.name,
   })
-    .then((name) => {
+    .then(() => {
       const index = workspaces.value.findIndex(
         ({ title }) => title === workspaceInfo.value?.workspace
       );
       workspaces.value[index] = {
-        title: name,
+        title: workspaceForm.inputs.name,
       };
     })
     .catch((e) => {
-      console.log("ERROR CREATING WORKSPACE: ", e);
+      NotifyState.notify({
+        title: "Rename workspace",
+        content: "Error while rename a workspace: " + workspaceForm.inputs.name,
+        type: "error",
+      });
     })
     .finally(() => {
       workspaceForm.show = false;
@@ -131,7 +145,12 @@ function selectContextMenu(type: "Remove" | "Rename") {
         }
       })
       .catch((e) => {
-        console.log("ERROR REMOVING CONTEXT: ", e);
+        NotifyState.notify({
+          title: "Create workspaces",
+          content:
+            "Error while remove a workspace " + workspaceForm.inputs.name,
+          type: "error",
+        });
       });
     workspaceInfo.value = null;
 
