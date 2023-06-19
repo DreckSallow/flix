@@ -38,6 +38,21 @@ pub fn get_deck_handler(workspace_name: &str, deck_name: &str) -> Result<Deck, S
     handlers::deck::get_deck(workspace_name, deck_name).or_else(|e| Err(e.to_string()))
 }
 
+#[tauri::command]
+pub fn remove_deck_handler(workspace_name: &str, deck_name: &str) -> Result<(), String> {
+    handlers::deck::remove_deck(workspace_name, deck_name).or_else(|e| Err(e.to_string()))
+}
+
+#[tauri::command]
+pub fn update_deck_handler(
+    workspace_name: &str,
+    deck_name: &str,
+    new_deck_name: &str,
+) -> Result<String, String> {
+    handlers::deck::update_deck_title(workspace_name, deck_name, new_deck_name)
+        .or_else(|e| Err(e.to_string()))
+}
+
 ///TODO: return only the deck name
 #[tauri::command]
 pub async fn import_deck_handler(workspace_name: &str, file_path: &str) -> Result<Deck, String> {
