@@ -44,6 +44,7 @@ const renderPage = ref<{
 
 watchEffect(() => {
   if (!workspaceData.value) return (decks.value = []);
+  renderPage.value.key = null;
   invoke<string[]>("get_decks_handler", {
     workspaceName: workspaceData.value.name,
   })
@@ -59,6 +60,7 @@ watchEffect(() => {
 
 watchEffect(() => {
   if (!workspaceData.value) return (docs.value = []);
+  renderPage.value.key = null;
   invoke<{ [k: number]: string }>("get_notes_info", {
     workspaceName: workspaceData.value.name,
   })
@@ -76,13 +78,6 @@ watchEffect(() => {
       });
     });
 });
-
-function resetRenderPage() {
-  renderPage.value = {
-    key: null,
-    type: "decks",
-  };
-}
 
 type TInfoOpt = {
   id: string | number;

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import styles from "./markdown.module.css";
-import { computed, reactive, ref, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { NotifyState } from "../../state";
 import { CheckIcon, CloseIcon, EditIcon, ReadIcon } from "@components/icons";
