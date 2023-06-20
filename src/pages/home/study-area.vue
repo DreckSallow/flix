@@ -292,11 +292,6 @@ aside.side-bar header {
   color: #6e6e6e;
 }
 
-.sidebar-options .accordion-header {
-  display: grid;
-  grid-template-columns: 1fr 20px;
-}
-
 section.section-content {
   width: calc(100% - 170px);
 }

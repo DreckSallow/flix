@@ -232,3 +232,10 @@ function createDeck(info: { pathFile?: string; name?: string }) {
     </Modal>
   </div>
 </template>
+
+<style scoped>
+.accordion-header {
+  display: grid;
+  grid-template-columns: 1fr 20px;
+}
+</style>
