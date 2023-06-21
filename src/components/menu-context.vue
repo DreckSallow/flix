@@ -31,7 +31,12 @@ const menuRef = useOutClick(() => {
 </script>
 
 <template>
-  <div class="menu-container absolute z-99 text-sm" ref="menuRef">
+  <div
+    class="menu-container absolute z-99 text-sm"
+    ref="menuRef"
+    tabindex="0"
+    @blur="$emit('close')"
+  >
     <ul
       class="menu flex flex-col items-start rounded-lg"
       @click.stop="selectOpt"

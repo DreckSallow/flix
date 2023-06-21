@@ -59,3 +59,22 @@ pub fn create_deck(workspace_name: &str, deck_name: &str) -> Result<Deck> {
 
     Ok(Deck::new(deck_path))
 }
+
+pub fn remove_deck(workspace_name: &str, deck_name: &str) -> Result<()> {
+    let deck_path = check_workspace_path(workspace_name)?.join(deck_name);
+    fs::remove_dir_all(deck_path)?;
+    Ok(())
+}
+
+pub fn update_deck_title(
+    workspace_name: &str,
+    deck_name: &str,
+    new_deck_name: &str,
+) -> Result<String> {
+    let workspace_path = check_workspace_path(workspace_name)?;
+    fs::rename(
+        workspace_path.join(deck_name),
+        workspace_path.join(new_deck_name),
+    )?;
+    Ok(new_deck_name.into())
+}

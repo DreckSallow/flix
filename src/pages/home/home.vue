@@ -180,7 +180,7 @@ function setCurrentWorkspace(e: MouseEvent) {
 
 <template>
   <aside
-    class="sidebar-main flex flex-col items-center justify-start py-6 gap-4 h-full bg-gray-100"
+    class="sidebar-main flex flex-col items-center justify-start py-6 gap-4 h-full"
   >
     <h3 class="text-blue-400 font-bold text-lg">FLIX</h3>
     <ul
@@ -255,6 +255,10 @@ function setCurrentWorkspace(e: MouseEvent) {
 <style scoped>
 aside.sidebar-main {
   width: 80px;
+  background-color: #f7f6f5;
+  border-style: solid;
+  border-right-width: 0.5px;
+  border-right-color: #6e6e6ed3;
 }
 
 aside.sidebar-main > ul {
