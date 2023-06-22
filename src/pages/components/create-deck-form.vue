@@ -80,9 +80,10 @@ async function getFileImport() {
     </nav>
     <main class="text-sm min-w-36">
       <div v-if="wayToCreate === 'create'">
+        <header class="mb-2">Create Deck:</header>
         <input
           v-focus
-          class="border border-strong border-solid rounded-md p-1"
+          class="border border-strong border-solid rounded-md p-2"
           type="text"
           tabindex="1"
           v-model="newDeckName"
