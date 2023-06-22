@@ -29,7 +29,7 @@ onMounted(() => {
     .catch((e) => {
       NotifyState.notify({
         title: "Workspaces Error",
-        content: "Error getting workspaces",
+        content: "An error occurred getting the workspaces.",
         type: "error",
       });
     });
@@ -54,6 +54,21 @@ const workspaceForm = reactive<TWorkspaceForm>({
 });
 
 function createOrUpdate(input: string) {
+  if (input.length === 0) {
+    return NotifyState.notify({
+      title: "Create workspace",
+      content: "The workspace name cannot be empty.",
+      type: "error",
+    });
+  }
+  if (workspaces.value.some(({ title }) => title === input)) {
+    return NotifyState.notify({
+      title: "Create workspace",
+      content: "The workspace name already exists.",
+      type: "error",
+    });
+  }
+
   if (workspaceForm.type === "create") {
     invoke("create_workspace_handler", {
       workspaceName: input,
@@ -68,8 +83,8 @@ function createOrUpdate(input: string) {
       })
       .catch((e) => {
         NotifyState.notify({
-          title: "Create workspaces",
-          content: "Error while create " + input + " workspace",
+          title: "Create Workspace",
+          content: "Error creating workspace " + input,
           type: "error",
         });
       })
@@ -99,10 +114,9 @@ function createOrUpdate(input: string) {
       };
     })
     .catch((e) => {
-      console.log(e);
       NotifyState.notify({
-        title: "Rename workspace",
-        content: "Error while rename a workspace: " + input,
+        title: "Rename Workspace",
+        content: "Error renaming workspace " + selectedWorkspace,
         type: "error",
       });
     })
@@ -153,9 +167,8 @@ function selectContextMenu(t: string | number) {
       })
       .catch((e) => {
         NotifyState.notify({
-          title: "Create workspaces",
-          content:
-            "Error while remove a workspace " + workspaceForm.inputs.name,
+          title: "Remove Workspace",
+          content: "Error deleting workspace " + workspaceForm.inputs.name,
           type: "error",
         });
       });

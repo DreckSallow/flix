@@ -45,8 +45,9 @@ async function getFileImport() {
     }
   } catch (e) {
     NotifyState.notify({
-      content: "Error importing into Flix",
-      title: "Importing file",
+      content: "Import Error",
+      title:
+        "An error occurred while importing a file. Make sure the file has the extension .apkg",
       type: "error",
     });
   }

@@ -72,8 +72,8 @@ watchEffect(() => {
     })
     .catch((e) => {
       NotifyState.notify({
-        title: "Notes info",
-        content: "Error getting the notes",
+        title: "Docs Error",
+        content: "Error getting the docs of " + workspaceData.value?.name,
         type: "error",
       });
     });
@@ -173,7 +173,7 @@ function createDeck(info: {
   if (decks.value.some((name) => name === newDeckName)) {
     NotifyState.notify({
       title: "Rename Deck",
-      content: "The deck '" + newDeckName + "' already exists",
+      content: "The deck '" + newDeckName + "' already exists.",
       type: "alert",
     });
     return;

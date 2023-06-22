@@ -1,5 +1,4 @@
 import { invoke } from "@tauri-apps/api";
-import { InvokeArgs } from "@tauri-apps/api/tauri";
 import { NotifyState } from "../../../state";
 import { IDeckResponse } from "@interfaces/index";
 
@@ -14,9 +13,9 @@ function remove_deck(data: TRemoveDeck, cb: QueryFn<null>) {
     .then(cb)
     .catch((e) => {
       NotifyState.notify({
+        title: "Remove Deck",
+        content: `An error occurred while removing the deck: ${data.deckName}`,
         type: "error",
-        title: "Error removing Deck",
-        content: `An error ocurred removing a deck (${data.deckName})`,
       });
     });
 }
@@ -32,9 +31,9 @@ function update_deck(data: TUpdateDeck, cb: QueryFn<string>) {
     .then(cb)
     .catch((e) => {
       NotifyState.notify({
+        title: "Update Deck",
+        content: `Failed to update the deck: ${data.deckName}`,
         type: "error",
-        title: "Error updating deck",
-        content: `An error ocurred updating ${data.deckName}`,
       });
     });
 }
@@ -50,8 +49,8 @@ function import_deck(data: TImportDeck, cb: QueryFn<IDeckResponse>) {
     .catch((e) => {
       NotifyState.notify({
         type: "error",
-        title: "Error importing a deck",
-        content: `An error ocurred importing ${data.filePath}`,
+        title: "Import Deck",
+        content: `An error occurred while importing: ${data.filePath}`,
       });
     });
 }
@@ -68,8 +67,8 @@ function create_deck(
     .catch((e) => {
       NotifyState.notify({
         type: "error",
-        title: "Error creating a deck",
-        content: `An error ocurred creating the deck: ${data.deckName}`,
+        title: "Create Deck",
+        content: `An error occurred while creating the deck: ${data.deckName}`,
       });
     });
 }
@@ -99,8 +98,8 @@ function create_doc(data: TCreateDoc, cb: QueryFn<Doc>) {
     .catch((e) => {
       NotifyState.notify({
         type: "error",
-        title: "Error creating a Doc",
-        content: `An error ocurred creating the doc: ${data.title}`,
+        title: "Create Doc",
+        content: `Failed to create the doc: ${data.title}`,
       });
     });
 }
@@ -115,8 +114,8 @@ function remove_doc(data: TRemoveDoc, cb: QueryFn<Doc>) {
     .catch((e) => {
       NotifyState.notify({
         type: "error",
-        title: "Error removing Doc",
-        content: `An error ocurred removing a doc`,
+        title: "Remove Doc",
+        content: `Failed to remove the doc`,
       });
     });
 }
@@ -132,8 +131,8 @@ function update_doc(data: TUpdateDoc, cb: QueryFn<Doc>) {
     .catch((e) => {
       NotifyState.notify({
         type: "error",
-        title: "Error updating Doc",
-        content: `An error ocurred updating ${data.title}`,
+        title: "Update Doc",
+        content: `Error updating doc: ${data.title}`,
       });
     });
 }

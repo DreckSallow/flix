@@ -47,8 +47,8 @@ watchEffect(() => {
     })
     .catch((e) => {
       NotifyState.notify({
-        title: "Select Note",
-        content: "The note not exist",
+        title: "Doc info",
+        content: "Error getting doc information",
         type: "error",
       });
     });
@@ -73,8 +73,8 @@ function update() {
     })
     .catch((e) => {
       NotifyState.notify({
-        title: "Save Note",
-        content: "An error ocurred saving a note",
+        title: "Save Doc",
+        content: "An error occurred while saving a doc.",
         type: "error",
       });
     });
