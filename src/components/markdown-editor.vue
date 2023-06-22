@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineEmits, onBeforeUnmount, onMounted, ref } from "vue";
+import { defineEmits, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { EditorView, basicSetup } from "codemirror";
 import { markdown } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
@@ -12,6 +12,7 @@ const props = defineProps<IProps>();
 
 interface IEvents {
   (e: "update:content", v: string): void;
+  (e: "save"): void;
 }
 
 const emit = defineEmits<IEvents>();
@@ -19,6 +20,12 @@ const emit = defineEmits<IEvents>();
 const editorRef = ref<HTMLElement | null>(null);
 
 const markdownEditor = ref<EditorView | null>(null);
+
+function onSave(e: KeyboardEvent) {
+  if (e.ctrlKey && e.key.toLowerCase() === "s") {
+    emit("save");
+  }
+}
 
 onMounted(() => {
   if (!editorRef.value) {
@@ -36,10 +43,12 @@ onMounted(() => {
     parent: editorRef.value,
   });
   markdownEditor.value = editorView;
+  editorView.dom.addEventListener("keydown", onSave);
 });
 
 onBeforeUnmount(() => {
   if (markdownEditor.value) {
+    markdownEditor.value.dom.removeEventListener("keydown", onSave);
     markdownEditor.value.destroy();
   }
 });

@@ -43,11 +43,12 @@ watchEffect(() => {
       isTextChanged.value = false;
       docState.value = data;
       docTextInput.set(data.text);
+      typePage.value = "read";
     })
     .catch((e) => {
       NotifyState.notify({
-        title: "Select Note",
-        content: "The note not exist",
+        title: "Doc info",
+        content: "Error getting doc information",
         type: "error",
       });
     });
@@ -72,8 +73,8 @@ function update() {
     })
     .catch((e) => {
       NotifyState.notify({
-        title: "Save Note",
-        content: "An error ocurred saving a note",
+        title: "Save Doc",
+        content: "An error occurred while saving a doc.",
         type: "error",
       });
     });
@@ -96,15 +97,15 @@ const docParsed = computed(() => {
 </script>
 
 <template>
-  <div class="w-full h-full">
+  <div class="w-full h-full overflow-auto">
     <section v-if="docState" class="docs-section">
-      <header class="bg-blue-300 text-white p-3">
+      <header class="p-3 h-60px items-center sticky top-0 bg-primary z-99">
         <h4 class="w-max">
           {{ docState.title }}
         </h4>
         <button @click="toggleRenderType" class="cursor-pointer w-max">
-          <EditIcon v-if="typePage === 'read'" class="h-5 w-5 fill-gray-600" />
-          <ReadIcon v-if="typePage === 'write'" class="h-5 w-5 fill-gray-600" />
+          <EditIcon v-if="typePage === 'read'" class="h-5 w-5 fill-strong" />
+          <ReadIcon v-if="typePage === 'write'" class="h-5 w-5 fill-strong" />
         </button>
         <button
           @click="update"
@@ -121,6 +122,7 @@ const docParsed = computed(() => {
       <main class="h-full w-full overflow-auto">
         <MarkdownEditor
           v-model:content="docTextInput.input.value"
+          @save="update"
           class="w-full h-full text-lg"
           v-if="typePage === 'write'"
         />
@@ -139,5 +141,8 @@ const docParsed = computed(() => {
 .docs-section > header {
   display: grid;
   grid-template-columns: 1fr 40px 40px;
+  border-style: solid;
+  border-bottom-width: 0.5px;
+  border-bottom-color: #6e6e6e5f;
 }
 </style>

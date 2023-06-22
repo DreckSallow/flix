@@ -10,6 +10,7 @@ import CreateDeckForm from "../../components/create-deck-form.vue";
 interface IProps {
   decks: string[];
   docs: { id: number; title: string }[];
+  selectedOpt: number | string | null;
 }
 
 defineProps<IProps>();
@@ -48,10 +49,16 @@ function selectOption(e: MouseEvent) {
     type: typeView,
   });
 }
+type TModalUpdate = {
+  show: boolean;
+  input: string;
+  titleLabel: "Rename Doc:" | "Rename Deck:";
+};
 
-const showModal = reactive({
+const showModal = reactive<TModalUpdate>({
   show: false,
   input: "",
+  titleLabel: "Rename Doc:",
 });
 
 type TMenuInfo = {
@@ -91,6 +98,8 @@ function menuSelectItem(key: string | number) {
 
   if (typeAction === "Rename") {
     showModal.input = menuContextState.info.value.data.name as string;
+    showModal.titleLabel =
+      typeAccordion === "decks" ? "Rename Deck:" : "Rename Doc:";
     showModal.show = true;
     return;
   }
@@ -147,13 +156,13 @@ function createDeck(info: { pathFile?: string; name?: string }) {
 </script>
 
 <template>
-  <div class="sidebar-options">
-    <Accordion custom>
+  <div class="sidebar-options p-1">
+    <Accordion custom :has-content="decks.length > 0">
       <template #header>
         <div class="accordion-header w-full">
           <span> decks </span>
           <span
-            class="text-gray-400 font-semibold text-center"
+            class="text-gray-400 font-semibold flex-center rounded-sm hover:bg-#ececec"
             @click.stop="showDeckModal.show = true"
             >+</span
           >
@@ -161,24 +170,32 @@ function createDeck(info: { pathFile?: string; name?: string }) {
       </template>
       <template #custom="{ show }" v-if="decks.length > 0">
         <ul
-          class="flex flex-col gap-4 bg-blue-200 text-white p-2 cursor-pointer"
+          class="accordion-list flex flex-col cursor-pointer"
           v-if="show"
           view="decks"
           @click="selectOption"
           @contextmenu.prevent="menuOpenHandler('decks', $event)"
         >
-          <li v-for="deck in decks" :item-id="deck" :item-title="deck">
+          <li
+            v-for="deck in decks"
+            :item-id="deck"
+            :item-title="deck"
+            :class="{
+              selected: selectedOpt === deck,
+            }"
+          >
             {{ deck }}
           </li>
         </ul>
       </template>
     </Accordion>
-    <Accordion custom>
+    <!-- <hr class="my-2 h-1px bg-#ececec" /> -->
+    <Accordion custom :has-content="docs.length > 0">
       <template #header>
         <div class="accordion-header w-full">
           <span> docs </span>
           <span
-            class="text-gray-400 font-semibold text-center"
+            class="text-gray-400 font-semibold flex-center rounded-sm hover:bg-#ececec"
             @click.stop="openModalDoc"
             >+</span
           >
@@ -186,13 +203,20 @@ function createDeck(info: { pathFile?: string; name?: string }) {
       </template>
       <template #custom="{ show }" v-if="docs.length > 0">
         <ul
-          class="flex flex-col gap-4 bg-blue-200 text-white p-2 cursor-pointer"
+          class="accordion-list flex flex-col cursor-pointer"
           view="docs"
           v-if="show"
           @click="selectOption"
           @contextmenu.prevent="menuOpenHandler('docs', $event)"
         >
-          <li v-for="doc in docs" :item-id="doc.id" :item-title="doc.title">
+          <li
+            v-for="doc in docs"
+            :item-id="doc.id"
+            :item-title="doc.title"
+            :class="{
+              selected: selectedOpt === doc.id,
+            }"
+          >
             {{ doc.title }}
           </li>
         </ul>
@@ -201,12 +225,13 @@ function createDeck(info: { pathFile?: string; name?: string }) {
     <MenuContext
       v-if="menuContextState.show.value"
       :style="{ ...menuContextState.style() }"
-      class="rounded-md bg-gray-300 py-2 px-1"
+      class="rounded-md py-2 px-1 bg-accent border-strong border-solid border-1px over-shadow"
       @close="menuContextState.updateShow(false)"
       :options="[{ text: 'Remove' }, { text: 'Rename' }]"
       @select-opt="menuSelectItem"
     />
     <ModalForm
+      :title-label="showModal.titleLabel"
       @close="showModal.show = false"
       @cancel="showModal.show = false"
       @accept="updateItem"
@@ -214,6 +239,7 @@ function createDeck(info: { pathFile?: string; name?: string }) {
       :input="showModal.input"
     />
     <ModalForm
+      title-label="Create Doc:"
       @close="modalDoc.show = false"
       @cancel="modalDoc.show = false"
       @accept="createDoc"
@@ -232,3 +258,22 @@ function createDeck(info: { pathFile?: string; name?: string }) {
     </Modal>
   </div>
 </template>
+
+<style scoped>
+.accordion-header {
+  display: grid;
+  grid-template-columns: 1fr 25px;
+}
+
+.accordion-list > li {
+  padding: 0.3em;
+  padding-left: 1.4em;
+  border-radius: 5px;
+  transition: background-color 200ms ease;
+}
+
+.accordion-list > li:hover,
+.accordion-list > li.selected {
+  background-color: #ececec;
+}
+</style>

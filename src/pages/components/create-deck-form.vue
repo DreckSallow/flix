@@ -45,8 +45,9 @@ async function getFileImport() {
     }
   } catch (e) {
     NotifyState.notify({
-      content: "Error importing into Flix",
-      title: "Importing file",
+      content: "Import Error",
+      title:
+        "An error occurred while importing a file. Make sure the file has the extension .apkg",
       type: "error",
     });
   }
@@ -79,9 +80,10 @@ async function getFileImport() {
     </nav>
     <main class="text-sm min-w-36">
       <div v-if="wayToCreate === 'create'">
+        <header class="mb-2">Create Deck:</header>
         <input
           v-focus
-          class="border border-gray-600/80 border-solid rounded-md p-1"
+          class="border border-strong border-solid rounded-md p-2"
           type="text"
           tabindex="1"
           v-model="newDeckName"
@@ -97,7 +99,7 @@ async function getFileImport() {
 
       <div class="flex flex-row gap-4 justify-end mt-4">
         <button
-          class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
+          class="bg-strong text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
           tabindex="2"
           @click="createDeck"
         >
@@ -105,7 +107,7 @@ async function getFileImport() {
         </button>
         <button
           tabindex="3"
-          class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
+          class="bg-strong text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
           @click="$emit('cancel')"
         >
           Cancel
@@ -123,6 +125,6 @@ nav li {
   padding-bottom: 2px;
 }
 nav li.selected {
-  border-color: rgb(96, 165, 250);
+  border-color: hsla(var(--bg-strong), 1) !important;
 }
 </style>

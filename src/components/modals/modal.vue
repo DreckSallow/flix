@@ -3,10 +3,11 @@ import { Transition } from "vue";
 import { CloseIcon } from "@components/icons";
 import { useOutClick } from "../../hooks";
 
-defineProps({
-  className: String,
-  show: Boolean,
-});
+interface IProps {
+  show: boolean;
+}
+
+defineProps<IProps>();
 
 const emit = defineEmits(["close"]);
 
@@ -26,14 +27,14 @@ const modalContent = useOutClick(() => {
         @keyup.esc="$emit('close')"
         v-if="show"
         ref="modalContent"
-        class="modal-content bg-gray-200 relative p-4 pt-8 rounded-lg"
+        class="modal-content relative p-4 pt-8 rounded-lg over-shadow bg-accent"
       >
         <button
           @click="$emit('close')"
           tabindex="0"
-          class="bg-gray-300 absolute top-1 right-1 cursor-pointer rounded-0.5"
+          class="absolute top-1 right-1 cursor-pointer rounded-0.5 bg-strong"
         >
-          <CloseIcon class="h-5 w-5 fill-gray-700" />
+          <CloseIcon class="h-5 w-5 fill-white" />
         </button>
         <slot />
       </div>

@@ -6,27 +6,35 @@ export interface INotification {
   type: TypeNotification;
   content: string;
   title: string;
+  debug?: string;
+}
+
+export interface INotifyId extends INotification {
+  id: number;
 }
 
 export class NotificationState {
-  private queue: Ref<INotification[]>;
+  private queue: Ref<INotifyId[]>;
 
   constructor() {
     this.queue = ref([]);
   }
 
   public notify(notification: INotification) {
-    console.log("NOTIFY METHOD!");
-    this.queue.value.push(notification);
+    this.queue.value.push({
+      ...notification,
+      id: this.queue.value.length,
+    });
   }
 
-  public remove(index: number) {
-    this.queue.value = this.queue.value
-      .slice(0, index)
-      .concat(this.queue.value.slice(index + 1));
+  public remove(notifyId: number) {
+    const index = this.queue.value.findIndex(({ id }) => notifyId === id);
+    if (index >= 0) {
+      this.queue.value.splice(index, 1);
+    }
   }
 
-  public get notifications(): INotification[] {
+  public get notifications(): INotifyId[] {
     return this.queue.value;
   }
 }

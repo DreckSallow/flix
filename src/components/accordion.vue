@@ -1,25 +1,39 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import Chevron from "./icons/chevron.vue";
 
 interface IProps {
   custom: boolean;
+  hasContent?: boolean;
 }
 
-defineProps<IProps>();
+const props = defineProps<IProps>();
 
 const isOpen = ref(false);
+
+watch(
+  () => props.hasContent,
+  () => {
+    isOpen.value = props.hasContent ?? false;
+  }
+);
 
 const arrowDirection = computed(() => {
   return isOpen.value ? "top" : "bottom";
 });
+
+function setOpen() {
+  if (props.hasContent) isOpen.value = !isOpen.value;
+}
 </script>
 
 <template>
   <div class="accordion">
-    <div @click="isOpen = !isOpen" class="cursor-pointer p-2 gap-2">
+    <div @click="setOpen" class="accordion-header cursor-pointer p-2 gap-2">
       <slot name="header"></slot>
-      <Chevron :direction="arrowDirection" class="h-6 w-6 fill-gray-400" />
+      <button class="rounded-sm hover:bg-#ececec cursor-pointer">
+        <Chevron :direction="arrowDirection" class="h-6 w-6 fill-gray-400" />
+      </button>
     </div>
     <div v-if="!custom && isOpen" class="p-2">
       <slot />

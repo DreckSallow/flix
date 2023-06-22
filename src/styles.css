@@ -1,5 +1,9 @@
-html{
-  font-family: 'Roboto', sans-serif;
+html {
+  font-family: "Roboto", sans-serif;
+}
+
+* {
+  color: #545454;
 }
 
 ::-webkit-scrollbar {
@@ -28,38 +32,53 @@ html{
   height: 100vh;
 }
 
-
-.light-theme {
-  --alpha: 1;
-  --bg-strong: 202, 40%, 96%;
-  /* --bg-soft: 227, 13%, 86%; */
-  --bg-soft: 201, 30%, 61%,
-
-  --text-strong: red;
-  --text-soft: green;
+.over-shadow {
+  box-shadow: 5px 6px 6px -2px hsla(var(--bg-shadow), 0.7);
+  -webkit-box-shadow: 2px 3px 10px -1px hsla(var(--bg-shadow), 0.7);
+  -moz-box-shadow: 5px 6px 6px -2px hsla(var(--bg-shadow), 0.7);
 }
 
-.dark-theme {
+.light-theme {
+  --bg-shadow: 0, 0%, 33%;
+  --bg-strong: 0, 1%, 47%;
+  /* --bg-strong: 0, 0%, 33%; */
   --alpha: 1;
-  --bg-strong: red;
-  --bg-soft: white;
+  --bg-primary: 0, 0%, 100%;
+  --bg-accent: 30, 11%, 96%;
+}
 
-  --text-strong: red;
-  --text-soft: green;
+.bg-accent {
+  background-color: hsla(var(--bg-accent), var(--alpha));
+}
+
+.bg-primary {
+  background-color: hsla(var(--bg-primary), var(--alpha));
 }
 
 .bg-strong {
   background-color: hsla(var(--bg-strong), var(--alpha));
 }
 
-.bg-soft {
-  background-color: hsla(var(--bg-soft), var(--alpha));
+.border-accent {
+  border-color: hsla(var(--bg-accent), var(--alpha));
 }
 
-.text-strong {
-  background-color: hsla(var(--text-strong), var(--alpha));
+.border-primary {
+  border-color: hsla(var(--bg-primary), var(--alpha));
 }
 
-.text-soft {
-  background-color: hsla(var(--text-soft), var(--alpha));
+.border-strong {
+  border-color: hsla(var(--bg-strong), var(--alpha));
+}
+
+.fill-accent {
+  fill: hsla(var(--bg-accent), var(--alpha));
+}
+
+.fill-primary {
+  fill: hsla(var(--bg-primary), var(--alpha));
+}
+
+.fill-strong {
+  fill: hsla(var(--bg-strong), var(--alpha));
 }

@@ -24,8 +24,8 @@ watchEffect(() => {
     })
     .catch((e) => {
       NotifyState.notify({
-        title: "Get the deck info",
-        content: "Error while get the deck info: " + props.deckName,
+        title: "Deck Info",
+        content: "Error getting card deck information:  " + props.deckName,
         type: "error",
       });
     });
