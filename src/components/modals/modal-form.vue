@@ -13,6 +13,7 @@ defineEmits<IEvents>();
 interface IProps {
   input: string;
   show: boolean;
+  titleLabel: string;
 }
 
 const props = defineProps<IProps>();
@@ -27,6 +28,7 @@ watchEffect(() => {
 <template>
   <Modal :show="show">
     <div class="flex flex-col gap-2">
+      <header>{{ titleLabel }}</header>
       <input
         v-focus
         class="border border-strong border-solid p-1 rounded-md"
