@@ -246,9 +246,9 @@ function createDoc(name: string) {
         @create-doc="createDoc"
         :selected-opt="renderPage.key"
       />
-      <div class="text-sm" v-if="!workspaceData">
+      <div class="text-sm p-2 flex-center" v-if="!workspaceData">
         <button
-          class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
+          class="bg-strong text-white px-3 py-2 text-xs rounded-1 cursor-pointer"
           @click.stop="$emit('create-workspace')"
         >
           Create a workspace
@@ -275,14 +275,14 @@ function createDoc(name: string) {
         v-if="!renderPage.key && workspaceData"
         class="flex-center w-full h-full"
       >
-        Select a Deck or doc to see in this area!
+        Select a Deck or a Doc view it here.
       </div>
     </section>
     <section
       v-else
       class="section-content h-full bg-view-section grid place-content-center"
     >
-      Does not have a workspace
+      You don't have a workspace created.
     </section>
   </div>
 </template>
