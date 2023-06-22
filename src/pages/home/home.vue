@@ -40,12 +40,14 @@ onBeforeUnmount(() => {
 });
 
 type TWorkspaceForm = {
+  inputLabel: "Create Workspace:" | "Rename Workspace:";
   show: boolean;
   inputs: { name: string };
   type: "create" | "update";
 };
 
 const workspaceForm = reactive<TWorkspaceForm>({
+  inputLabel: "Create Workspace:",
   show: false,
   inputs: {
     name: "",
@@ -90,6 +92,7 @@ function createOrUpdate(input: string) {
       })
       .finally(() => {
         workspaceForm.show = false;
+        workspaceForm.inputLabel = "Create Workspace:";
         workspaceForm.inputs.name = "";
       });
     return;
@@ -122,6 +125,7 @@ function createOrUpdate(input: string) {
     })
     .finally(() => {
       workspaceForm.show = false;
+      workspaceForm.inputLabel = "Create Workspace:";
       workspaceForm.inputs.name = "";
     });
 }
@@ -177,6 +181,7 @@ function selectContextMenu(t: string | number) {
   if (type === "Rename") {
     workspaceForm.show = true;
     workspaceForm.type = "update";
+    workspaceForm.inputLabel = "Rename Workspace:";
     workspaceForm.inputs.name = menuContext.getInfo().data as string;
   }
 }
@@ -193,6 +198,11 @@ function setCurrentWorkspace(e: MouseEvent) {
         : null
     );
   }
+}
+
+function openWorkspaceForm() {
+  workspaceForm.inputLabel = "Create Workspace:";
+  workspaceForm.show = true;
 }
 </script>
 
@@ -230,13 +240,14 @@ function setCurrentWorkspace(e: MouseEvent) {
     <button
       tabindex="0"
       class="rounded-lg w-10 h-10 bg-white grid place-content-center cursor-pointer"
-      @click.stop="workspaceForm.show = true"
-      @keyup.enter="workspaceForm.show = true"
+      @click.stop="openWorkspaceForm"
+      @keyup.enter="openWorkspaceForm"
     >
       +
     </button>
   </aside>
   <ModalForm
+    :title-label="workspaceForm.inputLabel"
     :show="workspaceForm.show"
     :input="workspaceForm.inputs.name"
     @accept="createOrUpdate"

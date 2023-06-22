@@ -49,10 +49,16 @@ function selectOption(e: MouseEvent) {
     type: typeView,
   });
 }
+type TModalUpdate = {
+  show: boolean;
+  input: string;
+  titleLabel: "Rename Doc:" | "Rename Deck:";
+};
 
-const showModal = reactive({
+const showModal = reactive<TModalUpdate>({
   show: false,
   input: "",
+  titleLabel: "Rename Doc:",
 });
 
 type TMenuInfo = {
@@ -92,6 +98,8 @@ function menuSelectItem(key: string | number) {
 
   if (typeAction === "Rename") {
     showModal.input = menuContextState.info.value.data.name as string;
+    showModal.titleLabel =
+      typeAccordion === "decks" ? "Rename Deck:" : "Rename Doc:";
     showModal.show = true;
     return;
   }
@@ -223,6 +231,7 @@ function createDeck(info: { pathFile?: string; name?: string }) {
       @select-opt="menuSelectItem"
     />
     <ModalForm
+      :title-label="showModal.titleLabel"
       @close="showModal.show = false"
       @cancel="showModal.show = false"
       @accept="updateItem"
@@ -230,6 +239,7 @@ function createDeck(info: { pathFile?: string; name?: string }) {
       :input="showModal.input"
     />
     <ModalForm
+      title-label="Create Doc:"
       @close="modalDoc.show = false"
       @cancel="modalDoc.show = false"
       @accept="createDoc"
