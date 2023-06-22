@@ -10,6 +10,7 @@ import CreateDeckForm from "../../components/create-deck-form.vue";
 interface IProps {
   decks: string[];
   docs: { id: number; title: string }[];
+  selectedOpt: number | string | null;
 }
 
 defineProps<IProps>();
@@ -147,13 +148,13 @@ function createDeck(info: { pathFile?: string; name?: string }) {
 </script>
 
 <template>
-  <div class="sidebar-options">
-    <Accordion custom>
+  <div class="sidebar-options p-1">
+    <Accordion custom :has-content="decks.length > 0">
       <template #header>
         <div class="accordion-header w-full">
           <span> decks </span>
           <span
-            class="text-gray-400 font-semibold text-center"
+            class="text-gray-400 font-semibold flex-center rounded-sm hover:bg-#ececec"
             @click.stop="showDeckModal.show = true"
             >+</span
           >
@@ -161,24 +162,32 @@ function createDeck(info: { pathFile?: string; name?: string }) {
       </template>
       <template #custom="{ show }" v-if="decks.length > 0">
         <ul
-          class="flex flex-col gap-4 bg-blue-200 text-white p-2 cursor-pointer"
+          class="accordion-list flex flex-col cursor-pointer"
           v-if="show"
           view="decks"
           @click="selectOption"
           @contextmenu.prevent="menuOpenHandler('decks', $event)"
         >
-          <li v-for="deck in decks" :item-id="deck" :item-title="deck">
+          <li
+            v-for="deck in decks"
+            :item-id="deck"
+            :item-title="deck"
+            :class="{
+              selected: selectedOpt === deck,
+            }"
+          >
             {{ deck }}
           </li>
         </ul>
       </template>
     </Accordion>
-    <Accordion custom>
+    <!-- <hr class="my-2 h-1px bg-#ececec" /> -->
+    <Accordion custom :has-content="docs.length > 0">
       <template #header>
         <div class="accordion-header w-full">
           <span> docs </span>
           <span
-            class="text-gray-400 font-semibold text-center"
+            class="text-gray-400 font-semibold flex-center rounded-sm hover:bg-#ececec"
             @click.stop="openModalDoc"
             >+</span
           >
@@ -186,13 +195,20 @@ function createDeck(info: { pathFile?: string; name?: string }) {
       </template>
       <template #custom="{ show }" v-if="docs.length > 0">
         <ul
-          class="flex flex-col gap-4 bg-blue-200 text-white p-2 cursor-pointer"
+          class="accordion-list flex flex-col cursor-pointer"
           view="docs"
           v-if="show"
           @click="selectOption"
           @contextmenu.prevent="menuOpenHandler('docs', $event)"
         >
-          <li v-for="doc in docs" :item-id="doc.id" :item-title="doc.title">
+          <li
+            v-for="doc in docs"
+            :item-id="doc.id"
+            :item-title="doc.title"
+            :class="{
+              selected: selectedOpt === doc.id,
+            }"
+          >
             {{ doc.title }}
           </li>
         </ul>
@@ -236,6 +252,18 @@ function createDeck(info: { pathFile?: string; name?: string }) {
 <style scoped>
 .accordion-header {
   display: grid;
-  grid-template-columns: 1fr 20px;
+  grid-template-columns: 1fr 25px;
+}
+
+.accordion-list > li {
+  padding: 0.3em;
+  padding-left: 1.4em;
+  border-radius: 5px;
+  transition: background-color 200ms ease;
+}
+
+.accordion-list > li:hover,
+.accordion-list > li.selected {
+  background-color: #ececec;
 }
 </style>

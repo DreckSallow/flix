@@ -2,12 +2,12 @@
 import { onBeforeUnmount, onMounted, provide, reactive, ref } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { sep } from "@tauri-apps/api/path";
-import { vFocus } from "../../directives";
-import { Modal } from "@components/modals";
+import { ModalForm } from "@components/modals";
 import MenuContext from "@components/menu-context.vue";
 import StudyArea from "./study-area.vue";
 import { useWorkspaceProvider, workspaceKeyProv } from "./provider";
 import { NotifyState } from "../../state";
+import { useMenuContext } from "../../hooks";
 
 const workspaces = ref<{ title: string }[]>([]);
 
@@ -53,24 +53,23 @@ const workspaceForm = reactive<TWorkspaceForm>({
   type: "create",
 });
 
-function createOrUpdate() {
+function createOrUpdate(input: string) {
   if (workspaceForm.type === "create") {
     invoke("create_workspace_handler", {
-      workspaceName: workspaceForm.inputs.name,
+      workspaceName: input,
     })
       .then(() => {
         workspaces.value.push({
-          title: workspaceForm.inputs.name,
+          title: input,
         });
         workspaceProvider.setData({
-          name: workspaceForm.inputs.name,
+          name: input,
         });
       })
       .catch((e) => {
         NotifyState.notify({
           title: "Create workspaces",
-          content:
-            "Error while create " + workspaceForm.inputs.name + " workspace",
+          content: "Error while create " + input + " workspace",
           type: "error",
         });
       })
@@ -80,54 +79,62 @@ function createOrUpdate() {
       });
     return;
   }
+  const selectedWorkspace = menuContext.getInfo().data;
   invoke<string>("rename_workspace_handler", {
-    workspaceName: workspaceInfo.value?.workspace,
-    newName: workspaceForm.inputs.name,
+    workspaceName: selectedWorkspace,
+    newName: input,
   })
     .then(() => {
       const index = workspaces.value.findIndex(
-        ({ title }) => title === workspaceInfo.value?.workspace
+        ({ title }) => title === selectedWorkspace
       );
+      if (workspaceProvider.workspaceData.value?.name === selectedWorkspace) {
+        workspaceProvider.setData({
+          name: input,
+        });
+      }
+
       workspaces.value[index] = {
-        title: workspaceForm.inputs.name,
+        title: input,
       };
     })
     .catch((e) => {
+      console.log(e);
       NotifyState.notify({
         title: "Rename workspace",
-        content: "Error while rename a workspace: " + workspaceForm.inputs.name,
+        content: "Error while rename a workspace: " + input,
         type: "error",
       });
     })
     .finally(() => {
       workspaceForm.show = false;
       workspaceForm.inputs.name = "";
-      workspaceInfo.value = null;
     });
 }
 
-type TMousePos = { x: number; y: number };
-
-const workspaceInfo = ref<{ workspace: string; mouse: TMousePos } | null>(null);
+const menuContext = useMenuContext(false, "");
 
 function openContextMenu(e: MouseEvent) {
   e.preventDefault();
   const el = e.currentTarget as HTMLLIElement | null;
   if (!el) return;
   const { x, width } = el.getBoundingClientRect();
-  workspaceInfo.value = {
+  menuContext.updateInfo({
     mouse: {
       x: x + width,
       y: e.clientY,
     },
-    workspace: el.getAttribute("workspace-name") as string,
-  };
+    data: el.getAttribute("workspace-name") as string,
+  });
+  menuContext.updateShow(true);
 }
 
-function selectContextMenu(type: "Remove" | "Rename") {
+function selectContextMenu(t: string | number) {
+  const type = t as "Remove" | "Rename";
   if (type === "Remove") {
+    menuContext.updateShow(false);
     invoke<string>("remove_workspace_handler", {
-      workspaceName: workspaceInfo.value?.workspace,
+      workspaceName: menuContext.getInfo().data,
     })
       .then((p) => {
         const name = p.split(sep).pop();
@@ -152,14 +159,12 @@ function selectContextMenu(type: "Remove" | "Rename") {
           type: "error",
         });
       });
-    workspaceInfo.value = null;
-
     return;
   }
   if (type === "Rename") {
     workspaceForm.show = true;
     workspaceForm.type = "update";
-    workspaceForm.inputs.name = workspaceInfo.value?.workspace as string;
+    workspaceForm.inputs.name = menuContext.getInfo().data as string;
   }
 }
 
@@ -180,9 +185,9 @@ function setCurrentWorkspace(e: MouseEvent) {
 
 <template>
   <aside
-    class="sidebar-main flex flex-col items-center justify-start py-6 gap-4 h-full"
+    class="sidebar-main flex flex-col items-center justify-start gap-4 h-full bg-accent"
   >
-    <h3 class="text-blue-400 font-bold text-lg">FLIX</h3>
+    <h3 class="font-bold text-lg h-60px flex-center pt-1.2">FLIX</h3>
     <ul
       class="flex flex-col gap-4 overflow-auto items-center w-full"
       @click="setCurrentWorkspace"
@@ -192,6 +197,8 @@ function setCurrentWorkspace(e: MouseEvent) {
         class="rounded-lg w-10 h-10 bg-white grid place-content-center cursor-pointer"
         :class="{
           selected: workspaceProvider.workspaceData.value?.name === space.title,
+          'border-strong':
+            workspaceProvider.workspaceData.value?.name === space.title,
         }"
         @contextmenu="openContextMenu"
         :workspace-name="space.title"
@@ -200,13 +207,10 @@ function setCurrentWorkspace(e: MouseEvent) {
       </li>
     </ul>
     <MenuContext
-      v-if="workspaceInfo"
-      :style="{
-        top: workspaceInfo.mouse.y + 'px',
-        left: workspaceInfo.mouse.x + 'px',
-      }"
-      @close="workspaceInfo = null"
-      class="rounded-md bg-gray-300 py-2 px-1"
+      v-if="menuContext.show.value"
+      :style="menuContext.style()"
+      @close="menuContext.updateShow(false)"
+      class="rounded-md bg-accent py-2 px-1 border-strong border-solid border-1px over-shadow"
       :options="[{ text: 'Remove' }, { text: 'Rename' }]"
       @select-opt="selectContextMenu"
     />
@@ -219,34 +223,13 @@ function setCurrentWorkspace(e: MouseEvent) {
       +
     </button>
   </aside>
-  <Modal @close="workspaceForm.show = false" :show="workspaceForm.show">
-    <div class="content-modal flex flex-col gap-2">
-      <input
-        v-focus
-        class="border-b border-gray-600/80 border-solid p-1"
-        type="text"
-        tabindex="1"
-        v-model="workspaceForm.inputs.name"
-        @keyup.enter="createOrUpdate"
-      />
-      <div class="flex flex-row gap-4 justify-end">
-        <button
-          class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
-          tabindex="2"
-          @click="createOrUpdate"
-        >
-          Ok
-        </button>
-        <button
-          tabindex="3"
-          class="bg-blue-400 text-white px-2 py-1 text-xs rounded-1 cursor-pointer"
-          @click="workspaceForm.show = false"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </Modal>
+  <ModalForm
+    :show="workspaceForm.show"
+    :input="workspaceForm.inputs.name"
+    @accept="createOrUpdate"
+    @cancel="workspaceForm.show = false"
+    @close="workspaceForm.show = false"
+  />
   <section class="section-content h-full">
     <StudyArea @create-workspace="workspaceForm.show = true" />
   </section>
@@ -255,14 +238,18 @@ function setCurrentWorkspace(e: MouseEvent) {
 <style scoped>
 aside.sidebar-main {
   width: 80px;
-  background-color: #f7f6f5;
   border-style: solid;
   border-right-width: 0.5px;
-  border-right-color: #6e6e6ed3;
+  border-right-color: #6e6e6e5f;
 }
 
 aside.sidebar-main > ul {
   max-height: 80%;
+}
+
+aside.sidebar-main > ul li.selected {
+  border-style: solid;
+  border-width: 2px;
 }
 
 section.section-content {
