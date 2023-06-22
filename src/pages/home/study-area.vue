@@ -224,11 +224,16 @@ function createDoc(name: string) {
 <template>
   <div class="flex flex-row h-full w-full">
     <aside
-      class="side-bar flex flex-col gap-4 h-full bg-gray-100"
+      class="side-bar flex flex-col gap-4 h-full bg-accent"
       v-if="showSidebar"
     >
-      <header class="text-lg font-semibold gap-4 text-center p-4">
-        <h4>{{ workspaceData?.name ?? "No Have workspace" }}</h4>
+      <header class="flex-center h-60px">
+        <h4
+          class="text-lg font-semibold truncate max-w-90%"
+          :title="workspaceData?.name ?? ''"
+        >
+          {{ workspaceData?.name ?? "No Have workspace" }}
+        </h4>
       </header>
       <SidebarOptions
         v-if="workspaceData"
@@ -239,6 +244,7 @@ function createDoc(name: string) {
         @update-opt="updateOpt"
         @create-deck="createDeck"
         @create-doc="createDoc"
+        :selected-opt="renderPage.key"
       />
       <div class="text-sm" v-if="!workspaceData">
         <button
@@ -250,7 +256,7 @@ function createDoc(name: string) {
       </div>
     </aside>
     <section
-      class="section-content h-full bg-white"
+      class="section-content h-full bg-primary"
       :class="{ expanded: !showSidebar }"
       v-if="workspaceData"
     >
@@ -265,10 +271,16 @@ function createDoc(name: string) {
         v-if="renderPage.type === 'docs' && renderPage.key"
         :doc-id="Number(renderPage.key)"
       />
+      <div
+        v-if="!renderPage.key && workspaceData"
+        class="flex-center w-full h-full"
+      >
+        Select a Deck or doc to see in this area!
+      </div>
     </section>
     <section
       v-else
-      class="section-content h-full bg-white grid place-content-center"
+      class="section-content h-full bg-view-section grid place-content-center"
     >
       Does not have a workspace
     </section>
@@ -278,17 +290,16 @@ function createDoc(name: string) {
 <style scoped>
 aside.side-bar {
   width: 170px;
-  background-color: #fdfdfd;
   border-style: solid;
 
   border-right-width: 0.5px;
-  border-right-color: #6e6e6ed3;
+  border-right-color: #6e6e6e5f;
 }
 
 aside.side-bar header {
   border-style: solid;
   border-bottom-width: 0.5px;
-  border-bottom-color: #6e6e6ed3;
+  border-bottom-color: #6e6e6e5f;
   color: #6e6e6e;
 }
 
