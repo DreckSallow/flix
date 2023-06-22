@@ -217,7 +217,7 @@ function createDeck(info: { pathFile?: string; name?: string }) {
     <MenuContext
       v-if="menuContextState.show.value"
       :style="{ ...menuContextState.style() }"
-      class="rounded-md bg-gray-300 py-2 px-1"
+      class="rounded-md py-2 px-1 bg-accent border-strong border-solid border-1px over-shadow"
       @close="menuContextState.updateShow(false)"
       :options="[{ text: 'Remove' }, { text: 'Rename' }]"
       @select-opt="menuSelectItem"
