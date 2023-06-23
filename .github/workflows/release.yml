@@ -36,6 +36,11 @@ jobs:
         with:
           workspaces: "./src-tauri -> target"
 
+      - name: Add pnpm manager
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.5.1
+
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
         with:
