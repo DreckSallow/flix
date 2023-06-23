@@ -37,6 +37,7 @@ function onTestCard() {
   if (currentIndex.value + 1 >= props.cards.length) {
     return emit("finishDeck");
   }
+  //TODO: add spaced repetition functionality
 
   currentIndex.value += 1;
   isRevealCard.value = false;
@@ -70,7 +71,7 @@ const buttonStyle = "p-2 text-xs rounded-1 cursor-pointer tracking-wide";
       Reveal
     </button>
     <ul class="flex flex-row gap-4">
-      <button
+      <!-- <button
         v-if="isRevealCard"
         @click="onTestCard"
         :class="'bg-strong text-white ' + buttonStyle"
@@ -83,6 +84,13 @@ const buttonStyle = "p-2 text-xs rounded-1 cursor-pointer tracking-wide";
         :class="'bg-strong text-white ' + buttonStyle"
       >
         Good
+      </button> -->
+      <button
+        v-if="isRevealCard"
+        @click="onTestCard"
+        :class="'bg-strong text-white ' + buttonStyle"
+      >
+        Next
       </button>
     </ul>
   </div>
