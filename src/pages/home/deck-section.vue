@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { sep } from "@tauri-apps/api/path";
+import dompurify from "dompurify";
 import { formatCard } from "@utils/card-format";
 import { computed, ref } from "vue";
 import { ICardResponse } from "../../types";
@@ -41,20 +42,30 @@ function onTestCard() {
   isRevealCard.value = false;
 }
 
+function getHtml() {
+  return dompurify.sanitize(
+    isRevealCard.value
+      ? (currentCard.value?.back as string)
+      : (currentCard.value?.front as string)
+  );
+}
+
 const buttonStyle = "p-2 text-xs rounded-1 cursor-pointer tracking-wide";
 </script>
 
 <template>
   <div class="cards-container h-full w-full">
     <div class="flex flex-col gap-6 items-center px-6" v-if="currentCard">
-      <div class="card flex flex-col gap-4 items-center">
-        <p v-html="isRevealCard ? currentCard.back : currentCard.front"></p>
+      <div
+        class="card flex-col gap-4 flex-center min-w-80px min-h-80px overscroll-auto"
+      >
+        <p v-html="getHtml()"></p>
       </div>
     </div>
     <button
       v-if="!isRevealCard"
       @click="onRevealCard"
-      :class="'bg-blue-400 text-white ' + buttonStyle"
+      :class="'bg-strong text-white ' + buttonStyle"
     >
       Reveal
     </button>
@@ -62,14 +73,14 @@ const buttonStyle = "p-2 text-xs rounded-1 cursor-pointer tracking-wide";
       <button
         v-if="isRevealCard"
         @click="onTestCard"
-        :class="'bg-blue-400 text-white ' + buttonStyle"
+        :class="'bg-strong text-white ' + buttonStyle"
       >
         Bad
       </button>
       <button
         v-if="isRevealCard"
         @click="onTestCard"
-        :class="'bg-blue-400 text-white ' + buttonStyle"
+        :class="'bg-strong text-white ' + buttonStyle"
       >
         Good
       </button>
@@ -94,5 +105,11 @@ div.card img {
   aspect-ratio: 1;
   object-fit: contain;
   max-height: 200px;
+}
+
+div > * {
+  display: flex;
+  gap: 0.4em;
+  flex-direction: column;
 }
 </style>
