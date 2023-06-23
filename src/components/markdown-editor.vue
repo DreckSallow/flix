@@ -40,7 +40,7 @@ onMounted(() => {
         emit("update:content", e.state.doc.toString());
       }),
     ],
-    parent: editorRef.value,
+    parent: editorRef.value as Element,
   });
   markdownEditor.value = editorView;
   editorView.dom.addEventListener("keydown", onSave);
