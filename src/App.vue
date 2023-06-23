@@ -1,15 +1,22 @@
 <script lang="ts" setup>
+import { computed } from "vue";
 import { NotifyState } from "./state";
 import Notification from "@components/notification.vue";
 
 function closeNotify(k: number) {
   NotifyState.remove(k);
 }
+const hasContent = computed(() => NotifyState.notifications.length > 0);
 </script>
 
 <template>
   <router-view></router-view>
-  <article class="fixed bottom-2 right-2 w-300px z-999 overflow-auto">
+  <article
+    class="fixed bottom-2 right-2 w-300px z-999 overflow-auto"
+    :class="{
+      'pointer-events-none': !hasContent,
+    }"
+  >
     <TransitionGroup
       class="p-3 flex flex-col gap-4"
       name="notifications"
