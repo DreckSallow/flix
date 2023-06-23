@@ -62,7 +62,7 @@ pub fn read_anki_files<P1: AsRef<Path>, P2: AsRef<Path>>(
                 .push_str(&format!("{}{}", fdl.name, 0x1f as char));
         });
         //Trim the final ','
-        card_info.items_format.pop();
+        card_info.items_format = card_info.items_format.trim_end_matches(0x1f as char).into();
 
         for itm in card_raw_data.text.split(0x1f as char) {
             let parsed_text = if itm.contains("sound:") {
@@ -80,7 +80,7 @@ pub fn read_anki_files<P1: AsRef<Path>, P2: AsRef<Path>>(
         }
 
         //Trim the final ','
-        card_info.items_format.pop();
+        card_info.items_format = card_info.items_format.trim_end_matches(0xf1 as char).into();
         cards_adapters.push(card_info);
     }
 
