@@ -21,7 +21,7 @@ defineProps<IProps>();
   </div>
 </template>
 
-<style>
+<style scoped>
 span.input-file {
   border: 2px rgba(174, 172, 172, 0.589) dashed;
   cursor: pointer;

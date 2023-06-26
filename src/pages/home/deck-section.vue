@@ -96,7 +96,7 @@ const buttonStyle = "p-2 text-xs rounded-1 cursor-pointer tracking-wide";
   </div>
 </template>
 
-<style>
+<style scoped>
 div.cards-container {
   align-items: center;
   display: grid;
