@@ -34,6 +34,7 @@ onMounted(() => {
   const editorView = new EditorView({
     doc: props.content,
     extensions: [
+      EditorView.lineWrapping,
       basicSetup,
       markdown({ codeLanguages: languages }),
       EditorView.updateListener.of((e) => {
