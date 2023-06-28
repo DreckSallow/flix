@@ -161,16 +161,17 @@ function createDeck(info: { pathFile?: string; name?: string }) {
       <template #header>
         <div class="accordion-header w-full">
           <span> decks </span>
-          <span
-            class="text-gray-400 font-semibold flex-center rounded-sm hover:bg-#ececec"
+          <button
+            class="text-gray-400 font-semibold flex-center cursor-pointer rounded-sm hover:bg-#ececec"
             @click.stop="showDeckModal.show = true"
-            >+</span
           >
+            +
+          </button>
         </div>
       </template>
       <template #custom="{ show }" v-if="decks.length > 0">
         <ul
-          class="accordion-list flex flex-col cursor-pointer"
+          class="accordion-list flex flex-col cursor-pointer text-sm gap-0.5 max-h-200px overflow-auto"
           v-if="show"
           view="decks"
           @click="selectOption"
@@ -189,21 +190,21 @@ function createDeck(info: { pathFile?: string; name?: string }) {
         </ul>
       </template>
     </Accordion>
-    <!-- <hr class="my-2 h-1px bg-#ececec" /> -->
-    <Accordion custom :has-content="docs.length > 0">
+    <Accordion custom :has-content="docs.length > 0" class="mt-2">
       <template #header>
         <div class="accordion-header w-full">
           <span> docs </span>
-          <span
-            class="text-gray-400 font-semibold flex-center rounded-sm hover:bg-#ececec"
+          <button
+            class="text-gray-400 font-semibold flex-center cursor-pointer rounded-sm hover:bg-#ececec"
             @click.stop="openModalDoc"
-            >+</span
           >
+            +
+          </button>
         </div>
       </template>
       <template #custom="{ show }" v-if="docs.length > 0">
         <ul
-          class="accordion-list flex flex-col cursor-pointer"
+          class="accordion-list flex flex-col cursor-pointer text-sm gap-0.5 max-h-200px overflow-auto"
           view="docs"
           v-if="show"
           @click="selectOption"
@@ -263,6 +264,14 @@ function createDeck(info: { pathFile?: string; name?: string }) {
 .accordion-header {
   display: grid;
   grid-template-columns: 1fr 25px;
+}
+
+:deep(.accordion-header:hover) {
+  background-color: #ececec;
+}
+
+:deep(.accordion-header > button:hover) {
+  background-color: #e3e2e2;
 }
 
 .accordion-list > li {

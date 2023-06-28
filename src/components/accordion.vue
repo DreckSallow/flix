@@ -29,9 +29,12 @@ function setOpen() {
 
 <template>
   <div class="accordion">
-    <div @click="setOpen" class="accordion-header cursor-pointer p-2 gap-2">
+    <div
+      @click="setOpen"
+      class="accordion-header cursor-pointer p-2 gap-2 rounded-md"
+    >
       <slot name="header"></slot>
-      <button class="rounded-sm hover:bg-#ececec cursor-pointer">
+      <button class="rounded-sm cursor-pointer">
         <Chevron :direction="arrowDirection" class="h-6 w-6 fill-gray-400" />
       </button>
     </div>
