@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineEmits, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { defineEmits, onBeforeUnmount, onMounted, ref } from "vue";
 import { EditorView, basicSetup } from "codemirror";
 import { markdown } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
@@ -60,6 +60,18 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+:deep(*) {
+  font-size: 1rem;
+}
+
+:deep(.cm-lineNumbers) {
+  align-items: center !important;
+}
+
+:deep(.cm-foldGutter) {
+  display: none !important;
+}
+
 #markdown-editor :deep(> div) {
   outline: none !important;
 }
