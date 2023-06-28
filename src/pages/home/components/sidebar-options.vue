@@ -171,7 +171,7 @@ function createDeck(info: { pathFile?: string; name?: string }) {
       </template>
       <template #custom="{ show }" v-if="decks.length > 0">
         <ul
-          class="accordion-list flex flex-col cursor-pointer text-sm gap-0.5 max-h-200px overflow-auto"
+          class="accordion-list flex flex-col cursor-pointer text-sm gap-0.5"
           v-if="show"
           view="decks"
           @click="selectOption"
@@ -181,6 +181,8 @@ function createDeck(info: { pathFile?: string; name?: string }) {
             v-for="deck in decks"
             :item-id="deck"
             :item-title="deck"
+            :title="deck"
+            class="text-ellipsis overflow-hidden"
             :class="{
               selected: selectedOpt === deck,
             }"
@@ -204,7 +206,7 @@ function createDeck(info: { pathFile?: string; name?: string }) {
       </template>
       <template #custom="{ show }" v-if="docs.length > 0">
         <ul
-          class="accordion-list flex flex-col cursor-pointer text-sm gap-0.5 max-h-200px overflow-auto"
+          class="accordion-list flex flex-col cursor-pointer text-sm gap-0.5"
           view="docs"
           v-if="show"
           @click="selectOption"
@@ -214,6 +216,8 @@ function createDeck(info: { pathFile?: string; name?: string }) {
             v-for="doc in docs"
             :item-id="doc.id"
             :item-title="doc.title"
+            :title="doc.title"
+            class="text-ellipsis overflow-hidden"
             :class="{
               selected: selectedOpt === doc.id,
             }"
@@ -274,9 +278,20 @@ function createDeck(info: { pathFile?: string; name?: string }) {
   background-color: #e3e2e2;
 }
 
+.accordion-list {
+  overflow: auto;
+  max-height: 200px;
+  padding: 0.2em;
+  padding-left: 0.7em;
+}
+
+.accordion-list::-webkit-scrollbar {
+  height: 2px;
+}
+
 .accordion-list > li {
+  overflow: hidden;
   padding: 0.3em;
-  padding-left: 1.4em;
   border-radius: 5px;
   transition: background-color 200ms ease;
 }
