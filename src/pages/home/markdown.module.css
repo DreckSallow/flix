@@ -100,6 +100,7 @@ h2::after {
 
 .markdown li {
   list-style-type: unset;
+  font-size: 1rem;
 }
 
 .markdown ul,
