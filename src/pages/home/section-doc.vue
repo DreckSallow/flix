@@ -104,8 +104,8 @@ const docParsed = computed(() => {
           {{ docState.title }}
         </h4>
         <button @click="toggleRenderType" class="cursor-pointer w-max">
-          <EditIcon v-if="typePage === 'read'" class="h-5 w-5 fill-strong" />
-          <ReadIcon v-if="typePage === 'write'" class="h-5 w-5 fill-strong" />
+          <EditIcon v-if="typePage === 'read'" class="h-6 w-6 fill-strong" />
+          <ReadIcon v-if="typePage === 'write'" class="h-6 w-6 fill-strong" />
         </button>
         <button
           @click="update"
